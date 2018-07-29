@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'electronic-nsc-client'
+    name: 'App'
   }
 </script>
 

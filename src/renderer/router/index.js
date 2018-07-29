@@ -8,11 +8,18 @@ export default new Router({
         {
             path: '/landing-page',
             name: 'landing-page',
-            component: require('@/components/LandingPage').default
+            // component: require('@/components/LandingPage').default
+            component: () => import('../components/LandingPage')
         },
         {
             path: '/',
-            component: require('../components/Login').default
-        }
+            // component: require('../components/common/login').default
+            component: () => import('../components/common/login'),
+        },
+        {
+            path: '/dashboard',
+            // component: require('../components/dashboard/dashboard').default
+            component: () => import('../components/dashboard/dashboard')
+        },
     ]
 })
