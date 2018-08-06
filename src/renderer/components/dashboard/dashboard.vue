@@ -3,7 +3,10 @@
         <div slot="body-right">
             <div style="padding: 16px 0;">
                 <Breadcrumb>
-                    <BreadcrumbItem><icon type="ios-analytics"></icon> 主页</BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <icon type="ios-analytics"></icon>
+                        主页
+                    </BreadcrumbItem>
                 </Breadcrumb>
             </div>
 
@@ -14,7 +17,10 @@
                           :style="{'background-color': stat.color}">
                         <div>
                             <h1>0</h1>
-                            <p style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><icon :type="stat.icon"></icon> {{stat.label}}</p>
+                            <p style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">
+                                <icon :type="stat.icon"></icon>
+                                {{stat.label}}
+                            </p>
                         </div>
                     </card>
                 </i-col>
@@ -24,6 +30,7 @@
                 <i-col :span="16">
                     <card dis-hover
                           :bordered="false">
+                        <b slot="title">最近7天处理文章趋势（采集包括新建）</b>
                         <div id="trend" style="height: 300px;">
 
                         </div>
@@ -32,9 +39,8 @@
                 <i-col :span="8">
                     <card dis-hover
                           :bordered="false">
-                        <div id="pie">
-
-                        </div>
+                        <strong slot="title">各项操作占比</strong>
+                        <div id="pie" style="height: 300px"></div>
                     </card>
                 </i-col>
             </row>
@@ -44,10 +50,12 @@
 
 <script>
     import echarts from 'echarts'
+    // import moment from 'moment'
+    import 'echarts/theme/roma'
 
     export default {
         name: "dashboard",
-        data() {
+        data () {
             return {
                 personalStats: [
                     {
@@ -96,17 +104,59 @@
                     Finish_Count: 0,
                 },
                 extra7Day: [],
-                summary7Day: []
+                summary7Day: [{"Date": "2018-07-31", "Extract_Count": 0, "Finish_Count": 0}, {
+                    "Date": "2018-08-01",
+                    "Extract_Count": 0,
+                    "Finish_Count": 0
+                }, {"Date": "2018-08-02", "Extract_Count": 0, "Finish_Count": 0}, {
+                    "Date": "2018-08-03",
+                    "Extract_Count": 0,
+                    "Finish_Count": 0
+                }, {"Date": "2018-08-04", "Extract_Count": 0, "Finish_Count": 0}, {
+                    "Date": "2018-08-05",
+                    "Extract_Count": 0,
+                    "Finish_Count": 0
+                }, {"Date": "2018-08-06", "Extract_Count": 0, "Finish_Count": 0}]
             }
         },
-        mounted() {
+        mounted () {
             // 基于准备好的dom，初始化echarts实例
-            let myChart = echarts.init(document.getElementById('trend'));
+            let myChart = echarts.init(document.getElementById('trend'), 'roma');
+            let xAxisData = [],
+                markPoint = {
+                    data: [
+                        {name: '周最低', type: 'min'},
+                        {name: '周最高', type: 'max'},
+                    ]
+                },
+                markLine = {
+                    data: [
+                        {type: 'average', name: '平均值'},
+                    ]
+                },
+                seriesExtract = {
+                    name: '采集数量',
+                    type: 'line',
+                    data: [],
+                    markLine,
+                    markPoint,
+                },
+                seriesFinish = {
+                    name: '成稿数量',
+                    type: 'line',
+                    data: [],
+                    markLine,
+                    markPoint,
+                }
+
+            this.summary7Day.forEach((v, k) => {
+                xAxisData.push(v['Date']);
+                seriesExtract.data.push(v['Extract_Count']);
+                seriesFinish.data.push(v['Finish_Count']);
+            })
+
             // 绘制图表
             myChart.setOption({
-                title: {
-                    text: 'ECharts 入门示例'
-                },
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -126,29 +176,64 @@
                     }
                 },
                 xAxis: {
-                    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子'],
+                    data: xAxisData,
                     axisPointer: {
                         type: 'shadow'
                     }
                 },
                 yAxis: {},
-                series: [{
-                    name: '销量',
-                    type: 'line',
-                    data: [5, 20, 36, 10, 10, 20],
-                    markPoint: {
-                        data: [
-                            {name: '周最低', type: 'min'},
-                            {name: '周最高', type: 'max'},
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            {type: 'average', name: '平均值'},
-                        ]
-                    }
-                }]
+                series: [seriesExtract, seriesFinish]
             });
+
+            let data = this.opData;
+            let pOpts = {
+                title: {
+                    subtext: '',
+                    x: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        dataView: {readOnly: false},
+                        magicType: {type: ['line', 'bar']},
+                        restore: {},
+                        saveAsImage: {}
+                    }
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: ['待译数量', '待校数量', '待编数量', '成稿数量']
+                },
+                series: [
+                    {
+                        name: `今日操作数据`,
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: [
+                            {value: Number(data['Trans_Count']), name: '待译数量'},
+                            {value: Number(data['Review_Count']), name: '待校数量'},
+                            {value: Number(data['Audit_Count']), name: '待编数量'},
+                            {value: Number(data['Finish_Count']), name: '成稿数量'},
+                        ],
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            let percent = echarts.init(document.getElementById('pie'), 'roma');
+            percent.setOption(pOpts);
         },
         components: {
             layout: require('../common/layout').default

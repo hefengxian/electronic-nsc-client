@@ -99,7 +99,7 @@
         & .login-container {
             width: 360px;
             height: 100vh;
-            padding-top: 100px;
+            padding-top: 10vh;
             margin: auto;
 
             & .logo {
