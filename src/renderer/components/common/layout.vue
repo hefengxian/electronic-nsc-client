@@ -9,10 +9,16 @@
                 </a>
             </div>
             <div class="nsc-header-right">
+                <a href="static/help.html"
+                   target="_blank"
+                   class="nsc-header-right-item">
+                    <icon type="md-help-circle"></icon> 使用帮助
+                </a>
+
                 <dropdown transfer
                           placement="bottom-end"
                           trigger="click">
-                    <div style="line-height: 32px; cursor: pointer;">
+                    <div class="nsc-header-right-item">
                         <avatar icon="ios-person"/> &nbsp;
                         <span>超级管理员</span>
                         <icon type="md-arrow-dropdown"></icon>
@@ -164,6 +170,17 @@
                 flex: 1;
                 display: flex;
                 justify-content: flex-end;
+
+                &-item {
+                    line-height: 32px;
+                    cursor: pointer;
+                    margin-right: 16px;
+                    user-select: none;
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
             }
         }
 
