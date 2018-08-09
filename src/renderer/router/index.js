@@ -12,12 +12,17 @@ export default new Router({
             component: () => import('../components/LandingPage')
         },
         {
-            path: '/',
+            path: '/login',
             // component: require('../components/common/login').default
             component: () => import('../components/common/login'),
         },
         {
             path: '/dashboard',
+            // component: require('../components/dashboard/dashboard').default
+            component: () => import('../components/dashboard/dashboard')
+        },
+        {
+            path: '/',
             // component: require('../components/dashboard/dashboard').default
             component: () => import('../components/dashboard/dashboard')
         },

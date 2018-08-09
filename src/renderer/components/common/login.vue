@@ -8,14 +8,22 @@
             <p class="info">用户登录</p>
             <div class="login-form">
                 <div class="form-item">
-                    <input type="text" placeholder="账号">
+                    <input type="text"
+                           v-model="username"
+                           placeholder="账号">
                 </div>
                 <div class="form-item">
-                    <input type="password" @click="handleSubmit" placeholder="密码">
+                    <input type="password"
+                           v-model="password"
+                           @click="handleSubmit" placeholder="密码">
                 </div>
             </div>
             <div class="submit">
-                <i-button type="primary" @click="handleSubmit" size="large" long>登 录</i-button>
+                <i-button type="primary"
+                          @click="handleSubmit"
+                          :loading="loading"
+                          size="large"
+                          long>登 录</i-button>
             </div>
 
             <div class="copyright">
@@ -33,6 +41,8 @@
 </template>
 
 <script>
+    import api from '../../api/'
+
     const bgImages = [
         '0001.jpg',
         '0002.jpg',
@@ -54,12 +64,16 @@
         name: 'Login',
         data () {
             return {
+                loading: false,
+                username: 'admin',
+                password: 'admin',
                 bgIndex: Math.floor(Math.random() * bgImages.length),
                 intervalId: null,
                 bgImages,
             }
         },
         created () {
+            // 首页图片轮换
             if (this.intervalId == null) {
                 this.intervalId = setInterval(() => {
                     this.bgIndex = Math.floor(Math.random() * bgImages.length)
@@ -75,8 +89,34 @@
         },
         methods: {
             handleSubmit() {
-                console.log('hello')
-                this.$router.push('/dashboard')
+                let data = {
+                    grant_type: 'password',
+                    client_id: '',
+                    client_secret: '',
+                    scope: '',
+                    username: this.username,
+                    password: this.password,
+                }
+                this.loading = true
+                api.public.login(data).then(resp => {
+                    let oauth = resp.data
+                    // 存储 Token 信息
+                    this.$localStore.setItem(this.$localStore.Keys.OAUTH_KEY, oauth)
+                    // 设置 axios 请求头
+                    api.setAuthorization(oauth)
+                    // 获取其他信息；用户信息，权限信息
+                    api.system.userInfo().then(resp => {
+                        this.loading = false
+                        this.$localStore.setItem(this.$localStore.Keys.USER_KEY, resp.data)
+                        // 跳转
+                        this.$router.push('/dashboard')
+
+                    })
+
+                }).catch(e => {
+                    console.log(e)
+                })
+                // this.$router.push('/dashboard')
             }
         },
         beforeDestroy () {

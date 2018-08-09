@@ -71,5 +71,5 @@ export default {
             accessToken = oauth['access_token'],
             authorization = tokenType + ' ' + accessToken
         axios.defaults.headers.common['Authorization'] = authorization
-    }
+    },
 }

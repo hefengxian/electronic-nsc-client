@@ -7,8 +7,11 @@ import iView from 'iview'
 import App from './App'
 import router from './router'
 import store from './store'
+import LocalStore from './plugin/local-store/'
 
 Vue.use(iView)
+Vue.use(LocalStore)
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false

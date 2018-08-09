@@ -13,7 +13,7 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`
 
-function createWindow () {
+function createWindow() {
     /**
      * Initial window options
      */
@@ -21,6 +21,9 @@ function createWindow () {
         useContentSize: true,
         width: 1366,
         height: 768,
+        webPreferences: {
+            webSecurity: false,
+        },
     })
 
     mainWindow.loadURL(winURL)

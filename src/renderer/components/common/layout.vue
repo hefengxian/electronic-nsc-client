@@ -20,7 +20,7 @@
                           trigger="click">
                     <div class="nsc-header-right-item">
                         <avatar icon="ios-person"/> &nbsp;
-                        <span>超级管理员</span>
+                        <span>{{userInfo['User_Name']}}_{{userInfo['User_Account']}}</span>
                         <icon type="md-arrow-dropdown"></icon>
                     </div>
                     <DropdownMenu slot="list">
@@ -28,7 +28,7 @@
                             <icon type="ios-person"></icon>
                             个人中心
                         </DropdownItem>
-                        <DropdownItem divided>
+                        <DropdownItem divided @click.native="logout">
                             <icon type="md-power"></icon>
                             退出
                         </DropdownItem>
@@ -61,7 +61,9 @@
     export default {
         name: "layout",
         data() {
+            let userInfo = this.$localStore.getItem(this.$localStore.Keys.USER_KEY)
             return {
+                userInfo,
                 menus: [
                     {
                         link: '',
@@ -105,7 +107,13 @@
                     },
                 ],
             }
-        }
+        },
+        methods: {
+            logout() {
+                this.$localStore.clear()
+                this.$router.push('/login')
+            }
+        },
     }
 </script>
 

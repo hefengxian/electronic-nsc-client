@@ -8,6 +8,13 @@
 
 import api from './api-client'
 
-export default {
+const PREFIX = '/v1/dashboard/'
 
+export default {
+    operationData() {
+        return api.doRequest(PREFIX + 'operation-data', api.GET)
+    },
+    recentSummary() {
+        return api.doRequest(PREFIX + 'recent-summary', api.GET)
+    },
 }
