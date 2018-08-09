@@ -66,12 +66,12 @@
                 userInfo,
                 menus: [
                     {
-                        link: '',
+                        link: '/dashboard',
                         icon: 'ios-analytics',
                         label: '主页',
                     },
                     {
-                        link: '',
+                        link: '/extraction-list',
                         icon: 'md-download',
                         label: '采集库',
                     },
@@ -118,26 +118,6 @@
 </script>
 
 <style lang="less">
-    .margin {
-        &-top {
-            &-16 {
-                margin-top: 16px;
-            }
-            &-24 {
-                margin-top: 24px;
-            }
-        }
-    }
-    .padding {
-        &-top {
-            &-16 {
-                padding-top: 16px;
-            }
-            &-24 {
-                padding-top: 24px;
-            }
-        }
-    }
 
     .nsc {
         display: flex;

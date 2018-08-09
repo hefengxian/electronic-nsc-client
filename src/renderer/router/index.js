@@ -6,12 +6,6 @@ Vue.use(Router)
 export default new Router({
     routes: [
         {
-            path: '/landing-page',
-            name: 'landing-page',
-            // component: require('@/components/LandingPage').default
-            component: () => import('../components/LandingPage')
-        },
-        {
             path: '/login',
             // component: require('../components/common/login').default
             component: () => import('../components/common/login'),
@@ -25,6 +19,10 @@ export default new Router({
             path: '/',
             // component: require('../components/dashboard/dashboard').default
             component: () => import('../components/dashboard/dashboard')
+        },
+        {
+            path: '/extraction-list',
+            component: () => import('../components/extraction/list'),
         },
     ]
 })

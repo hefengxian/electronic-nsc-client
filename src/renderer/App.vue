@@ -26,6 +26,6 @@
     }
 </script>
 
-<style>
-    /* CSS */
+<style lang="less">
+    @import './assets/app';
 </style>
