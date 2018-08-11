@@ -17,7 +17,22 @@ export default {
     count(params) {
         return api.doRequest(PREFIX + 'count', api.GET, params)
     },
+    articles(params) {
+        return api.doRequest(PREFIX + 'articles', api.GET, params)
+    },
     create(data) {
         return api.doRequest(PREFIX + 'create', api.POST, null, data)
+    },
+    edit(data) {
+        return api.doRequest(PREFIX + 'edit', api.PUT, null, data)
+    },
+    select(data) {
+        return api.doRequest(PREFIX + 'select', api.PUT, null, data)
+    },
+    read(data) {
+        return api.doRequest(PREFIX + 'read', api.PUT, null, data)
+    },
+    remove(params) {
+        return api.doRequest(PREFIX + 'delete', api.DELETE, params)
     },
 }

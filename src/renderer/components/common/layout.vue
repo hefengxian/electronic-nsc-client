@@ -10,7 +10,7 @@
             </div>
             <div class="nsc-header-right">
                 <button-group size="small" class="nsc-header-right-item">
-                    <i-button @click="$router.back"
+                    <i-button @click="$router.back()"
                               title="向前"
                               icon="ios-arrow-back"></i-button>
                     <i-button @click="$router.forward()"
@@ -29,7 +29,7 @@
                           trigger="click">
                     <div class="nsc-header-right-item">
                         <avatar icon="ios-person"/> &nbsp;
-                        <span>{{userInfo['User_Name']}}_{{userInfo['User_Account']}}</span>
+                        <span>{{userInfo['User_Name']}}</span>
                         <icon type="md-arrow-dropdown"></icon>
                     </div>
                     <DropdownMenu slot="list">
