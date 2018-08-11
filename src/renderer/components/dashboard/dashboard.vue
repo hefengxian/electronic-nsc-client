@@ -15,7 +15,7 @@
                           :bordered="false"
                           :style="{'background-color': stat.color}">
                         <div>
-                            <h1>0</h1>
+                            <h1>{{opData[stat.code]}}</h1>
                             <p style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">
                                 <icon :type="stat.icon"></icon>
                                 {{stat.label}}
