@@ -1,15 +1,14 @@
 <template>
     <layout>
+        <div slot="nav-left">
+            <Breadcrumb>
+                <BreadcrumbItem>
+                    <icon type="md-download"></icon>
+                    采集库
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div slot="body-right">
-            <div style="padding: 16px 0;">
-                <Breadcrumb>
-                    <BreadcrumbItem>
-                        <icon type="md-download"></icon>
-                        采集库
-                    </BreadcrumbItem>
-                </Breadcrumb>
-            </div>
-
             <card dis-hover
                   class="nsc-form"
                   :bordered="false">
@@ -73,7 +72,7 @@
                                 <DropdownItem divided>删除</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
-                        <Button>
+                        <Button @click="$router.push('/create-article')">
                             <icon type="md-add"></icon>
                             新建文章
                         </Button>
@@ -82,9 +81,8 @@
                     </div>
                 </div>
                 <div class="nsc-list-body margin-top-8 margin-bottom-8">
-                    <!--<i-table :columns="columns" :data="listData.data"></i-table>
-                    <br>-->
                     <div class="ivu-table-wrapper ivu-table ivu-table-default" style="">
+                        <Spin fix v-if="loading"></Spin>
                         <table style="width: 100%; border: 0;" cellspacing="0" cellpadding="0">
                             <thead>
                             <tr>
@@ -98,7 +96,10 @@
                             </tr>
                             </thead>
                             <tbody class="ivu-table-tbody">
-                            <tr v-for="(article, key) in listData.data"
+                            <tr v-if="listRecords.data.length === 0">
+                                <td class="ivu-table-column-center" colspan="5">当前条件下没有数据</td>
+                            </tr>
+                            <tr v-for="(article, key) in listRecords.data"
                                 @mouseenter="$set(article, '_showAction', true)"
                                 @mouseleave="$set(article, '_showAction', false)"
                                 :key="key">
@@ -126,7 +127,7 @@
                     <div class="nsc-list-footer-left">
                     </div>
                     <div class="nsc-list-footer-right">
-                        <Page :total="listData.total"
+                        <Page :total="listRecords.total"
                               style="font-size: 12px;"
                               show-elevator
                               placement="top"
@@ -139,16 +140,17 @@
 </template>
 
 <script>
-    import api from '../../api/'
-
     export default {
         data () {
             return {
+                loading: false,
                 form: {
                     extracted_time: '',
                     selected: '',
                     language: '',
                     keyword: '',
+                    page_no: '',
+                    page_size: '',
                 },
                 languages: [
                     {
@@ -191,7 +193,7 @@
                         }
                     ]
                 },
-                columns: [
+                /*columns: [
                     {
                         type: 'selection',
                         width: 50,
@@ -218,200 +220,24 @@
                             return '...'
                         }
                     },
-                ],
-                listData: {
-                    data: [
-                        {
-                            "Article_Detail_ID": "1",
-                            "Article_Content_ID": null,
-                            "Website_Group_ID": null,
-                            "Author_ID": null,
-                            "Author_Raw_ID": null,
-                            "Website_No": "S0001",
-                            "Domain_Code": null,
-                            "Media_Type_Code": "O",
-                            "RefPage_Type": null,
-                            "RefPage_URL_ID": null,
-                            "Is_Manual_Added": "0",
-                            "Website_Column_Level": "0",
-                            "Website_Important_Level": "B",
-                            "Article_URL": "https:\/\/vue-loader.vuejs.org\/guide\/pre-processors.html#sass",
-                            "Article_Title": "Hello Test",
-                            "Article_Abstract": null,
-                            "Article_Focus_Keywords": null,
-                            "Article_Search_Keywords": null,
-                            "Article_Emotion_Keywords": null,
-                            "Record_MD5_ID": "6419c0a50744051e66f4ef3cea894a26",
-                            "Article_Title_FingerPrint": null,
-                            "Article_Content": "Hello",
-                            "Article_Content_FingerPrint": null,
-                            "Article_RawID": null,
-                            "Article_Is_Reply": "0",
-                            "Article_Reply_No": null,
-                            "Article_Author": "Tom",
-                            "Article_Source": "BBC Sport",
-                            "Article_ViewCount": null,
-                            "Article_ReplyCount": null,
-                            "Article_ForwardCount": null,
-                            "Article_PubTime_Str": null,
-                            "Article_PubTime": "2018-08-10 02:11:45",
-                            "Article_Section_ID": null,
-                            "Article_Local_Htm_Filename": null,
-                            "Article_Local_Img_Filename": null,
-                            "Extracted_Time": "2018-08-10 02:11:45",
-                            "Article_Emotion_Type": null,
-                            "Processed_Flag": null,
-                            "Attachment_Status": "N",
-                            "Article_ImgSrc": null,
-                            "Topic_Record_MD5_ID": null,
-                            "Is_Need_Reply": "0",
-                            "Node_ID": null,
-                            "Microblog_Type": null,
-                            "Video_Length": null,
-                            "Province_Name": null,
-                            "City_Name": null,
-                            "County_Name": null,
-                            "Importance_Score": null,
-                            "Is_Read": "1",
-                            "Read_Time": "2018-08-10 02:11:47",
-                            "Read_User_ID": "1",
-                            "Is_Selected": "0",
-                            "Selected_Time": "2018-08-10 02:11:45",
-                            "Selected_User_ID": null,
-                            "Raw_Language_Code": null,
-                            "Read_User_Name": "\u8d85\u7ea7\u7ba1\u7406\u5458",
-                            "Selected_User_Name": null
-                        },
-                        {
-                            "Article_Detail_ID": "1",
-                            "Article_Content_ID": null,
-                            "Website_Group_ID": null,
-                            "Author_ID": null,
-                            "Author_Raw_ID": null,
-                            "Website_No": "S0001",
-                            "Domain_Code": null,
-                            "Media_Type_Code": "O",
-                            "RefPage_Type": null,
-                            "RefPage_URL_ID": null,
-                            "Is_Manual_Added": "0",
-                            "Website_Column_Level": "0",
-                            "Website_Important_Level": "B",
-                            "Article_URL": "https:\/\/vue-loader.vuejs.org\/guide\/pre-processors.html#sass",
-                            "Article_Title": "Hello Test",
-                            "Article_Abstract": null,
-                            "Article_Focus_Keywords": null,
-                            "Article_Search_Keywords": null,
-                            "Article_Emotion_Keywords": null,
-                            "Record_MD5_ID": "6419c0a50744051e66f4ef3cea894a26",
-                            "Article_Title_FingerPrint": null,
-                            "Article_Content": "Hello",
-                            "Article_Content_FingerPrint": null,
-                            "Article_RawID": null,
-                            "Article_Is_Reply": "0",
-                            "Article_Reply_No": null,
-                            "Article_Author": "Tom",
-                            "Article_Source": "BBC Sport",
-                            "Article_ViewCount": null,
-                            "Article_ReplyCount": null,
-                            "Article_ForwardCount": null,
-                            "Article_PubTime_Str": null,
-                            "Article_PubTime": "2018-08-10 02:11:45",
-                            "Article_Section_ID": null,
-                            "Article_Local_Htm_Filename": null,
-                            "Article_Local_Img_Filename": null,
-                            "Extracted_Time": "2018-08-10 02:11:45",
-                            "Article_Emotion_Type": null,
-                            "Processed_Flag": null,
-                            "Attachment_Status": "N",
-                            "Article_ImgSrc": null,
-                            "Topic_Record_MD5_ID": null,
-                            "Is_Need_Reply": "0",
-                            "Node_ID": null,
-                            "Microblog_Type": null,
-                            "Video_Length": null,
-                            "Province_Name": null,
-                            "City_Name": null,
-                            "County_Name": null,
-                            "Importance_Score": null,
-                            "Is_Read": "1",
-                            "Read_Time": "2018-08-10 02:11:47",
-                            "Read_User_ID": "1",
-                            "Is_Selected": "0",
-                            "Selected_Time": "2018-08-10 02:11:45",
-                            "Selected_User_ID": null,
-                            "Raw_Language_Code": null,
-                            "Read_User_Name": "\u8d85\u7ea7\u7ba1\u7406\u5458",
-                            "Selected_User_Name": null
-                        },
-                        {
-                            "Article_Detail_ID": "1",
-                            "Article_Content_ID": null,
-                            "Website_Group_ID": null,
-                            "Author_ID": null,
-                            "Author_Raw_ID": null,
-                            "Website_No": "S0001",
-                            "Domain_Code": null,
-                            "Media_Type_Code": "O",
-                            "RefPage_Type": null,
-                            "RefPage_URL_ID": null,
-                            "Is_Manual_Added": "0",
-                            "Website_Column_Level": "0",
-                            "Website_Important_Level": "B",
-                            "Article_URL": "https:\/\/vue-loader.vuejs.org\/guide\/pre-processors.html#sass",
-                            "Article_Title": "Hello Test",
-                            "Article_Abstract": null,
-                            "Article_Focus_Keywords": null,
-                            "Article_Search_Keywords": null,
-                            "Article_Emotion_Keywords": null,
-                            "Record_MD5_ID": "6419c0a50744051e66f4ef3cea894a26",
-                            "Article_Title_FingerPrint": null,
-                            "Article_Content": "Hello",
-                            "Article_Content_FingerPrint": null,
-                            "Article_RawID": null,
-                            "Article_Is_Reply": "0",
-                            "Article_Reply_No": null,
-                            "Article_Author": "Tom",
-                            "Article_Source": "BBC Sport",
-                            "Article_ViewCount": null,
-                            "Article_ReplyCount": null,
-                            "Article_ForwardCount": null,
-                            "Article_PubTime_Str": null,
-                            "Article_PubTime": "2018-08-10 02:11:45",
-                            "Article_Section_ID": null,
-                            "Article_Local_Htm_Filename": null,
-                            "Article_Local_Img_Filename": null,
-                            "Extracted_Time": "2018-08-10 02:11:45",
-                            "Article_Emotion_Type": null,
-                            "Processed_Flag": null,
-                            "Attachment_Status": "N",
-                            "Article_ImgSrc": null,
-                            "Topic_Record_MD5_ID": null,
-                            "Is_Need_Reply": "0",
-                            "Node_ID": null,
-                            "Microblog_Type": null,
-                            "Video_Length": null,
-                            "Province_Name": null,
-                            "City_Name": null,
-                            "County_Name": null,
-                            "Importance_Score": null,
-                            "Is_Read": "1",
-                            "Read_Time": "2018-08-10 02:11:47",
-                            "Read_User_ID": "1",
-                            "Is_Selected": "0",
-                            "Selected_Time": "2018-08-10 02:11:45",
-                            "Selected_User_ID": null,
-                            "Raw_Language_Code": null,
-                            "Read_User_Name": "\u8d85\u7ea7\u7ba1\u7406\u5458",
-                            "Selected_User_Name": null
-                        },
-                    ],
-                    total: 1
+                ],*/
+                listRecords: {
+                    list: [],
+                    total: 0
                 }
             }
         },
         mounted () {
+            this.doQuery()
         },
-        methods: {},
+        methods: {
+            doQuery(reset = true) {
+
+                this.$api.extraction.list(this.form).then(resp => {
+                    console.log(resp.data)
+                })
+            }
+        },
         components: {
             layout: require('../common/layout').default
         }

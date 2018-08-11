@@ -41,8 +41,6 @@
 </template>
 
 <script>
-    import api from '../../api/'
-
     const bgImages = [
         '0001.jpg',
         '0002.jpg',
@@ -98,14 +96,14 @@
                     password: this.password,
                 }
                 this.loading = true
-                api.public.login(data).then(resp => {
+                this.$api.public.login(data).then(resp => {
                     let oauth = resp.data
                     // 存储 Token 信息
                     this.$localStore.setItem(this.$localStore.Keys.OAUTH_KEY, oauth)
                     // 设置 axios 请求头
-                    api.setAuthorization(oauth)
+                    this.$api.setAuthorization(oauth)
                     // 获取其他信息；用户信息，权限信息
-                    api.system.userInfo().then(resp => {
+                    this.$api.system.userInfo().then(resp => {
                         this.loading = false
                         this.$localStore.setItem(this.$localStore.Keys.USER_KEY, resp.data)
                         // 跳转

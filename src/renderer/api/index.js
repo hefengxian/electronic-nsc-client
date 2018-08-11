@@ -10,12 +10,21 @@ import apiClient from './api-client'
 import dashboard  from './dashboard-api'
 import publicApi from './public-api'
 import system from './system-api'
+import extraction from './extraction-api'
 
 const api = {
     ...apiClient,
     dashboard,
     public: publicApi,
     system,
+    extraction,
 }
 
-export default api
+export default {
+    // ...api,
+    // 可以作为 Vue 插件
+    install(Vue, options) {
+        Vue.api = api
+        Vue.prototype.$api = api
+    }
+}

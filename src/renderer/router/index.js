@@ -5,6 +5,7 @@ Vue.use(Router)
 
 export default new Router({
     routes: [
+
         {
             path: '/login',
             // component: require('../components/common/login').default
@@ -24,5 +25,10 @@ export default new Router({
             path: '/extraction-list',
             component: () => import('../components/extraction/list'),
         },
+        {
+            path: '/create-article',
+            component: () => import('../components/extraction/create'),
+        },
+        { path: '*', redirect: '/' },
     ]
 })

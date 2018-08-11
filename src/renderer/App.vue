@@ -5,7 +5,6 @@
 </template>
 
 <script>
-    import api from './api/'
     export default {
         name: 'App',
         created() {
@@ -13,7 +12,7 @@
             // 第一次加载或者页面刷新之后
             // 1. 检查是否登录（查 localStorage）
             if (this.$localStore.getItem(this.$localStore.Keys.OAUTH_KEY)) {
-                api.setAuthorization(this.$localStore.getItem(this.$localStore.Keys.OAUTH_KEY))
+                this.$api.setAuthorization(this.$localStore.getItem(this.$localStore.Keys.OAUTH_KEY))
                 // 是，跳转到 dashboard
                 this.$router.push(location.hash.replace('#', ''))
             } else {

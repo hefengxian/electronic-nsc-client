@@ -1,15 +1,14 @@
 <template>
     <layout>
+        <div slot="nav-left">
+            <Breadcrumb>
+                <BreadcrumbItem>
+                    <icon type="ios-analytics"></icon>
+                    主页
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div slot="body-right">
-            <div style="padding: 16px 0;">
-                <Breadcrumb>
-                    <BreadcrumbItem>
-                        <icon type="ios-analytics"></icon>
-                        主页
-                    </BreadcrumbItem>
-                </Breadcrumb>
-            </div>
-
             <row :gutter="16" style="color: #fff; text-align: center;">
                 <i-col :span="4" v-for="(stat, key) in personalStats" :key="key">
                     <card dis-hover
@@ -51,7 +50,6 @@
 <script>
     import echarts from 'echarts'
     import 'echarts/theme/roma'
-    import api from '../../api/'
 
     export default {
         name: "dashboard",
@@ -112,12 +110,12 @@
             let percentChart = echarts.init(document.getElementById('percent'), 'roma');
             trendChart.showLoading()
             percentChart.showLoading()
-            api.dashboard.operationData().then(resp => {
+            this.$api.dashboard.operationData().then(resp => {
                 this.opData = resp.data
                 percentChart.hideLoading()
                 this.initOperationPercentChart(percentChart)
             })
-            api.dashboard.recentSummary().then(resp => {
+            this.$api.dashboard.recentSummary().then(resp => {
                 this.summary7Day = resp.data
                 trendChart.hideLoading()
                 this.initTrendChart(trendChart)
