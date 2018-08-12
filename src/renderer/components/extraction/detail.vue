@@ -30,7 +30,7 @@
                     <!-- 操作 -->
                     <div class="article-action">
                         <div>
-                            <i-button @click="" icon="md-create">编辑</i-button>
+                            <i-button @click="$router.push(`/extraction/edit/${article.Article_Detail_ID}`)" icon="md-create">编辑</i-button>
                             <i-button @click="handleActions('select')" v-if="article.Is_Selected !== 1" icon="md-checkmark">选择</i-button>
                             <i-button @click="handleActions('unselect')" v-if="article.Is_Selected !== 0" icon="md-close">取消选择</i-button>
                             <i-button @click="handleActions('delete')" icon="md-trash">删除</i-button>
@@ -115,7 +115,7 @@
             this.$api.system.currentGroupUser().then(resp => {
                 this.currentGroupUser = resp.data
             })
-            this.getArticle()
+            // this.getArticle()
         },
         computed: {
             articleInfo() {
@@ -185,7 +185,7 @@
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': 'getArticle'
+            // '$route': 'getArticle'
         },
         methods: {
             /**
@@ -264,7 +264,12 @@
         },
         components: {
             layout: require('../common/layout').default,
-        }
+        },
+        beforeRouteEnter (to, from, next) {
+            next(vm => {
+                vm.getArticle()
+            })
+        },
     }
 </script>
 

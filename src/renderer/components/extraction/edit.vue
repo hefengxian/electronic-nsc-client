@@ -3,8 +3,8 @@
         <div slot="nav-left">
             <Breadcrumb>
                 <BreadcrumbItem>
-                    <icon type="md-add"></icon>
-                    创建文章
+                    <icon type="md-create"></icon>
+                    编辑文章
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -19,7 +19,7 @@
                     <row>
                         <i-col span="22">
                             <form-item label="标题" prop="article_title">
-                                <i-input v-model="article.article_title"
+                                <i-input v-model="article.Article_Title"
                                          placeholder="文章标题"></i-input>
                             </form-item>
                         </i-col>
@@ -28,19 +28,19 @@
                     <row>
                         <i-col span="8">
                             <form-item label="原文网址" prop="article_url">
-                                <i-input v-model="article.article_url"
+                                <i-input v-model="article.Article_URL"
                                          placeholder=""></i-input>
                             </form-item>
                         </i-col>
                         <i-col span="8">
                             <form-item label="来源" prop="article_source">
-                                <i-input v-model="article.article_source"
+                                <i-input v-model="article.Article_Source"
                                          placeholder="文章来源，例如：BBC News"></i-input>
                             </form-item>
                         </i-col>
                         <i-col span="6">
                             <form-item label="作者">
-                                <i-input v-model="article.article_author"
+                                <i-input v-model="article.Article_Author"
                                          placeholder="文章作者，不填则自动为当前登录用户"></i-input>
                             </form-item>
                         </i-col>
@@ -63,7 +63,7 @@
                     <form-item label="摘要" v-if="showCollapse">
                         <row>
                             <i-col span="22">
-                                <i-input v-model="article.article_abstract"
+                                <i-input v-model="article.Article_Abstract"
                                          type="textarea"
                                          placeholder="摘要"></i-input>
                             </i-col>
@@ -73,7 +73,7 @@
                     <form-item label="正文" prop="article_content">
                         <row type="flex">
                             <i-col span="22">
-                                <editor v-model="article.article_content"
+                                <editor v-model="article.Article_Content"
                                         @ready="handleEditorReady"
                                         :options="editorOptions"></editor>
                             </i-col>
@@ -95,7 +95,7 @@
                                 </i-button>
                             </i-col>
                             <i-col span="20">
-                                <i-button @click="$router.push('/extraction')">放弃</i-button>
+                                <i-button @click="$router.push(`/extraction/detail/${article.Article_Detail_ID}`)">放弃</i-button>
                             </i-col>
                         </row>
                     </form-item>
@@ -139,22 +139,22 @@
                 editorOptions,
                 showCollapse: false,
                 article: {
-                    article_title: '',
-                    article_author: '',
-                    article_url: '',
-                    article_source: '',
-                    article_abstract: '',
-                    article_content: '',
+                    Article_Title: '',
+                    Article_Content: '',
+                    Article_Author: '',
+                    Article_Source: '',
+                    Article_Abstract: '',
+                    Article_URL: '',
                 },
                 validateRule: {
-                    article_title: [
+                    Article_Title: [
                         {
                             required: true,
                             message: '标题不能为空',
                             trigger: 'blur'
                         },
                     ],
-                    article_url: [
+                    Article_URL: [
                         {
                             type: 'url',
                             required: true,
@@ -162,14 +162,14 @@
                             trigger: 'blur'
                         },
                     ],
-                    article_source: [
+                    Article_Source: [
                         {
                             required: true,
                             message: '来源不能为空',
                             trigger: 'blur'
                         },
                     ],
-                    article_content: [
+                    Article_Content: [
                         {
                             required: true,
                             message: '文章内容不能为空',
@@ -190,6 +190,22 @@
         mounted () {
         },
         methods: {
+            /**
+             * 获取文章详情
+             */
+            getArticle () {
+                if (!this.$route.params.id) return
+
+                let id = this.$route.params.id
+
+                this.loading = true
+                this.$api.extraction.detail({id}).then(resp => {
+                    this.loading = false
+                    this.article = resp.data
+                }).catch(e => {
+                    this.loading = false
+                })
+            },
             handleEditorReady (e) {
             },
             handleSubmit (name) {
@@ -203,10 +219,11 @@
             },
             doSubmit () {
                 let params = {...this.article}
-                this.$api.extraction.create(params).then(resp => {
+                this.$api.extraction.edit(params).then(resp => {
+                    console.log('resp', resp)
                     // 返回列表
                     this.$Message.info('保存成功！')
-                    this.$router.push('/extraction')
+                    this.$router.push(`/extraction/detail/${params.Article_Detail_ID}`)
                 }).catch(e => {
                     this.$Message.error('保存失败！')
                 })
@@ -215,7 +232,12 @@
         components: {
             layout: require('../common/layout').default,
             editor: quillEditor,
-        }
+        },
+        beforeRouteEnter (to, from, next) {
+            next(vm => {
+                vm.getArticle()
+            })
+        },
     }
 </script>
 

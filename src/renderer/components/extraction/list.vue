@@ -144,7 +144,7 @@
                                                  :to="`/extraction/detail/${article.Article_Detail_ID}`">
                                         <p>
                                             <b>{{article.Article_Title}}</b>
-                                            <span v-if="article.Article_Abstract !== null"
+                                            <span v-if="typeof article.Article_Abstract === 'string' && article.Article_Abstract.trim().length > 0"
                                                   class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
                                         </p>
                                     </router-link>

@@ -34,6 +34,10 @@ export default new Router({
                     component: () => import('../components/extraction/detail'),
                 },
                 {
+                    path: 'edit/:id',
+                    component: () => import('../components/extraction/edit'),
+                },
+                {
                     path: 'create',
                     component: () => import('../components/extraction/create'),
                 },
