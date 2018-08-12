@@ -95,7 +95,7 @@
     import numeral from 'numeral'
 
     export default {
-        name: "translate-detail",
+        name: "translation-detail",
         data () {
             return {
                 loading: false,

@@ -43,6 +43,24 @@ export default new Router({
                 },
             ],
         },
+        {
+            path: '/translation',
+            component: () => import('../components/translation/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/translation/list'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('../components/translation/detail'),
+                },
+                {
+                    path: 'translate/:id',
+                    component: () => import('../components/translation/translate'),
+                },
+            ],
+        },
         { path: '*', redirect: '/' },
     ]
 })

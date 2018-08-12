@@ -60,7 +60,7 @@
                         </i-col>
                         <i-col :span="6">
                             <form-item label="关键词">
-                                <i-input placeholder="关键词：标题、摘要、作者"
+                                <i-input placeholder="关键词：标题、摘要、作者、内容"
                                          @on-search="doQuery()"
                                          v-model="form.keyword"
                                          clearable

@@ -11,6 +11,7 @@ import dashboard  from './dashboard-api'
 import publicApi from './public-api'
 import system from './system-api'
 import extraction from './extraction-api'
+import translation from './translation-api'
 
 const api = {
     ...apiClient,
@@ -18,6 +19,7 @@ const api = {
     public: publicApi,
     system,
     extraction,
+    translation,
 }
 
 export default {

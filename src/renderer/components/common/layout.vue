@@ -11,10 +11,10 @@
             <div class="nsc-header-right">
                 <button-group size="small" class="nsc-header-right-item">
                     <i-button @click="$router.back()"
-                              title="向前"
+                              title="向后"
                               icon="ios-arrow-back"></i-button>
                     <i-button @click="$router.forward()"
-                              title="向后"
+                              title="向前"
                               icon="ios-arrow-forward"></i-button>
                 </button-group>
 
@@ -94,22 +94,22 @@
                         label: '采集库',
                     },
                     {
-                        link: '/translation-list',
+                        link: '/translation',
                         icon: 'md-swap',
                         label: '待译库',
                     },
                     {
-                        link: '/proofreading-list',
+                        link: '/proofreading',
                         icon: 'md-done-all',
                         label: '待校库',
                     },
                     {
-                        link: '/audit-list',
+                        link: '/audit',
                         icon: 'ios-create',
                         label: '待编库',
                     },
                     {
-                        link: '/finished-list',
+                        link: '/finished',
                         icon: 'md-filing',
                         label: '成稿库',
                     },

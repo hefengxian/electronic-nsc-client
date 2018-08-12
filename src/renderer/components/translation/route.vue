@@ -6,7 +6,7 @@
 
 <script>
     export default {
-        name: "translate-route",
+        name: "translation-route",
         components: {
             layout: require('../common/layout').default,
         }
