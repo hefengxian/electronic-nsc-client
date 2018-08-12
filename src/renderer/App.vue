@@ -19,8 +19,6 @@
                 // 不是，跳转到 login
                 this.$router.push('login')
             }
-
-
         },
     }
 </script>

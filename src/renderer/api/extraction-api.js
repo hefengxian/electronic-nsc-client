@@ -20,6 +20,9 @@ export default {
     articles(params) {
         return api.doRequest(PREFIX + 'articles', api.GET, params)
     },
+    detail(params) {
+        return api.doRequest(PREFIX + 'detail', api.GET, params)
+    },
     create(data) {
         return api.doRequest(PREFIX + 'create', api.POST, null, data)
     },

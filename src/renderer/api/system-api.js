@@ -20,4 +20,10 @@ export default {
     privilege() {
         return api.doRequest(PREFIX + 'privilege', api.GET)
     },
+    languages() {
+        return api.doRequest(PREFIX + 'languages', api.GET)
+    },
+    currentGroupUser() {
+        return api.doRequest(PREFIX + 'current-group-user', api.GET)
+    },
 }

@@ -22,12 +22,22 @@ export default new Router({
             component: () => import('../components/dashboard/dashboard')
         },
         {
-            path: '/extraction-list',
-            component: () => import('../components/extraction/list'),
-        },
-        {
-            path: '/create-article',
-            component: () => import('../components/extraction/create'),
+            path: '/extraction',
+            component: () => import('../components/extraction/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/extraction/list'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('../components/extraction/detail'),
+                },
+                {
+                    path: 'create',
+                    component: () => import('../components/extraction/create'),
+                },
+            ],
         },
         { path: '*', redirect: '/' },
     ]

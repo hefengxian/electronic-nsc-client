@@ -44,11 +44,16 @@
                             <form-item label="原文语种">
                                 <i-select v-model="form.language"
                                           clearable
+                                          filterable
+                                          placeholder="选择或者键入关键词过滤"
                                           @on-change="doQuery()">
                                     <i-option value="">&nbsp;</i-option>
                                     <i-option v-for="(lan, key) in languages"
                                               :key="key"
-                                              :value="lan.value">{{lan.label}}
+                                              :label="lan.Raw_Language_Name_CN"
+                                              :value="lan.Raw_Language_Code">
+                                        <span>{{lan.Raw_Language_Name_CN}}</span>
+                                        <span style="color:#ccc"> - {{lan.Raw_Language_Code}} - {{lan.Raw_Language_Name_EN}} - {{lan.Raw_Language_Name_Local}}</span>
                                     </i-option>
                                 </i-select>
                             </form-item>
@@ -84,7 +89,7 @@
                                 <DropdownItem @click.native="handleBatchAction('delete')" divided>删除</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
-                        <Button @click="$router.push('/create-article')">
+                        <Button @click="$router.push('/extraction/create')">
                             <icon type="md-add"></icon>
                             新建文章
                         </Button>
@@ -135,10 +140,13 @@
                                 </td>
                                 <td class="ivu-table-cell ivu-table-cell-ellipsis article-info">
                                     <!-- 标题、摘要 -->
-                                    <router-link :to="`detail/${article.Article_Detail_ID}`">
-                                        <b>{{article.Article_Title}}</b>
-                                        <span v-if="article.Article_Abstract !== null"
-                                              class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
+                                    <router-link @click.native="handleDetailLinkClick(article)"
+                                                 :to="`/extraction/detail/${article.Article_Detail_ID}`">
+                                        <p>
+                                            <b>{{article.Article_Title}}</b>
+                                            <span v-if="article.Article_Abstract !== null"
+                                                  class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
+                                        </p>
                                     </router-link>
                                 </td>
                                 <td class="ivu-table-cell ivu-table-cell-ellipsis article-info">
@@ -219,16 +227,7 @@
                     page_no: 1,
                     page_size: 10,
                 },
-                languages: [
-                    {
-                        value: 'zh-cn',
-                        label: '汉语',
-                    },
-                    {
-                        value: 'en',
-                        label: 'English',
-                    },
-                ],
+                languages: [],
                 datepickerOptions: {
                     shortcuts: [
                         {
@@ -270,46 +269,6 @@
                         },
                     ]
                 },
-                /*columns: [
-                    {
-                        type: 'selection',
-                        width: 50,
-                        align: 'center'
-                    },
-                    {
-                        title: '标题/摘要',
-                        key: 'Article_Title',
-                        ellipsis: true,
-                        render (h, params) {
-                            return h('a', [
-                                h('b', [
-                                    `${params['row']['Article_Title']}`
-                                ]),
-                                h('span', [
-                                    ` - ${params['row']['Article_Abstract']}`
-                                ])
-                            ])
-                            // return `${params['row']['Article_Title']} - ${params['row']['Article_Abstract']}`
-                        }
-                    },
-                    {
-                        title: '来源',
-                        width: 150,
-                        key: 'Article_Source',
-                    },
-                    {
-                        title: '采集时间',
-                        width: 150,
-                        key: 'Extracted_Time',
-                    },
-                    {
-                        title: '操作',
-                        width: 150,
-                        render (h, params) {
-                            return '...'
-                        }
-                    },
-                ],*/
                 listRecords: {
                     list: [],
                     total: 0
@@ -322,7 +281,6 @@
             }
         },
         mounted () {
-            this.doQuery()
         },
         methods: {
             /**
@@ -363,15 +321,17 @@
              */
             handleBatchAction (type) {
                 let ids = this.selected.map(v => v.Article_Detail_ID)
-
                 switch (type) {
                     case 'read':
+                        ids = this.selected.filter(v => v.Is_Read !== 1).map(v => v.Article_Detail_ID)
                         this.doRead(ids)
                         break;
                     case 'select':
+                        ids = this.selected.filter(v => v.Is_Selected !== 1).map(v => v.Article_Detail_ID)
                         this.doSelect(ids)
                         break;
                     case 'unselect':
+                        ids = this.selected.filter(v => v.Is_Selected === 1).map(v => v.Article_Detail_ID)
                         this.doSelect(ids, false)
                         break;
                     case 'delete':
@@ -388,7 +348,7 @@
              */
             doRead (ids) {
                 if (ids.length < 1) {
-                    this.$Message.info('请选择至少 1 条数据进行操作')
+                    this.$Message.info('请选择至少 1 条符合条件的数据进行操作')
                     return
                 }
 
@@ -413,7 +373,7 @@
              */
             doSelect (ids, action = true) {
                 if (ids.length < 1) {
-                    this.$Message.info('请选择至少 1 条数据进行操作')
+                    this.$Message.info('请选择至少 1 条符合条件的数据进行操作')
                     return
                 }
 
@@ -508,11 +468,30 @@
                 if (article.Is_Read === 1) {
                     return ['article-read']
                 }
+            },
+
+            /**
+             * 处理点击详情链接
+             *
+             * @param {object} article 当前点击的文章
+             */
+            handleDetailLinkClick(article) {
+                if (article.Is_Read !== 1) {
+                    this.doRead([article['Article_Detail_ID']])
+                }
             }
         },
         components: {
             layout: require('../common/layout').default
-        }
+        },
+        beforeRouteEnter (to, from, next) {
+            next(vm => {
+                vm.$api.system.languages().then(resp => {
+                    vm.languages = resp.data.list
+                })
+                vm.doQuery(false)
+            })
+        },
     }
 </script>
 

@@ -89,7 +89,7 @@
                         label: '主页',
                     },
                     {
-                        link: '/extraction-list',
+                        link: '/extraction',
                         icon: 'md-download',
                         label: '采集库',
                     },
