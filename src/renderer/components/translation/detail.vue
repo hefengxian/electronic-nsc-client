@@ -297,6 +297,9 @@
                 })
             },
 
+            /**
+             * 获取文章
+             */
             getArticle() {
                 if (!this.$route.params.id) return
 
@@ -322,7 +325,6 @@
                     })
                 })
             },
-
 
         },
         beforeRouteEnter(to, from, next) {

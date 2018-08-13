@@ -216,7 +216,6 @@
             },
         },
         components: {
-            layout: require('../common/layout').default,
             editor: quillEditor,
         }
     }
