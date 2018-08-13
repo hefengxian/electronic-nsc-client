@@ -87,6 +87,98 @@ hr {
 }
 
 
+.content {
+  display: flex;
+  flex-direction: row;
+
+  & .article-detail {
+    flex: 1;
+    overflow: auto;
+
+    & .article-action {
+      display: flex;
+    }
+
+    & ul.article-meta {
+      text-align: center;
+      font-size: 12px;
+      & li {
+        display: inline-block;
+        padding: 0 16px;
+      }
+    }
+
+    & .article-title {
+      font-size: 25px;
+      line-height: 35px;
+      padding: 40px 0;
+      text-align: center;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    & .article-abstract, & .article-content {
+      font-size: 16px;
+      letter-spacing: 1px;
+      font-weight: 400;
+      line-height: 32px;
+      margin-bottom: 50px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 670px;
+      white-space: pre-line;
+      word-break: break-all;
+      word-wrap: break-word;
+
+      // 限制图片的最大宽度
+      img {
+        max-width: 660px !important;
+        text-align: center;
+      }
+
+      & p {
+        margin-bottom: 30px;
+      }
+    }
+    & .article-abstract {
+      padding: 15px 30px 15px 15px;
+      border-left: 5px solid #eee;
+      border-radius: 0 4px 4px 0;
+      &.note-info {
+        background-color: #f5f8fd;
+        border-color: #8bb4e7;
+        color: #010407;
+      }
+    }
+  }
+}
+
+.info {
+  margin-left: 16px;
+  width: 280px;
+  & table {
+    width: 100%;
+    table-layout: fixed;
+    & tr td {
+      padding: 3px 8px;
+      font-size: 12px;
+      word-break: keep-all;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:first-child {
+        text-align: right;
+        width: 80px;
+      }
+      &:last-child {
+      }
+    }
+  }
+}
+
+
 .nsc {
   display: flex;
   flex-direction: column;

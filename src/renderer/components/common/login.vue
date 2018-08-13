@@ -6,7 +6,7 @@
             </div>
             <div class="title">外文体育信息采编系统</div>
             <p class="info">用户登录</p>
-            <div class="login-form">
+            <div class="login-form" @keypress.enter="handleSubmit">
                 <div class="form-item">
                     <input type="text"
                            v-model="username"
@@ -15,7 +15,7 @@
                 <div class="form-item">
                     <input type="password"
                            v-model="password"
-                           @click="handleSubmit" placeholder="密码">
+                           placeholder="密码">
                 </div>
             </div>
             <div class="submit">

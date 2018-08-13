@@ -1,211 +1,204 @@
 <template>
-    <layout>
-        <div slot="nav-left">
-            <Breadcrumb>
-                <BreadcrumbItem>
-                    <icon type="md-download"></icon>
-                    采集库
-                </BreadcrumbItem>
-            </Breadcrumb>
+    <div>
+        <div class="nsc-body-right-nav">
+            <div class="nsc-body-right-nav-left">
+                <Breadcrumb>
+                    <BreadcrumbItem>
+                        <icon type="md-download"></icon>
+                        采集库
+                    </BreadcrumbItem>
+                </Breadcrumb>
+            </div>
+            <div class="nsc-body-right-nav-right"></div>
         </div>
-        <div slot="body-right">
-            <card dis-hover
-                  class="nsc-form"
-                  :bordered="false">
-                <i-form label-position="top"
-                        v-model="form">
-                    <row :gutter="24">
-                        <i-col :span="6">
-                            <form-item label="采集时间">
-                                <DatePicker type="daterange"
-                                            :options="datepickerOptions"
-                                            v-model="form.extracted_time"
-                                            :clearable="false"
-                                            @on-change="handleDatePickerChange"
-                                            format="yyyy/MM/dd"
-                                            placement="bottom-start"
-                                            split-panels
-                                            placeholder="选择日期范围"
-                                            style="width: 100%;"></DatePicker>
-                            </form-item>
-                        </i-col>
-                        <i-col :span="6">
-                            <form-item label="选择状态">
-                                <i-select v-model="form.selected"
-                                          clearable
-                                          @on-change="doQuery()">
-                                    <i-option value="">&nbsp;</i-option>
-                                    <i-option value="Y">已选</i-option>
-                                    <i-option value="N">未选</i-option>
-                                </i-select>
-                            </form-item>
-                        </i-col>
-                        <i-col :span="6">
-                            <form-item label="原文语种">
-                                <i-select v-model="form.language"
-                                          clearable
-                                          filterable
-                                          placeholder="选择或者键入关键词过滤"
-                                          @on-change="doQuery()">
-                                    <i-option value="">&nbsp;</i-option>
-                                    <i-option v-for="(lan, key) in languages"
-                                              :key="key"
-                                              :label="lan.Raw_Language_Name_CN"
-                                              :value="lan.Raw_Language_Code">
-                                        <span>{{lan.Raw_Language_Name_CN}}</span>
-                                        <span style="color:#ccc"> - {{lan.Raw_Language_Code}} - {{lan.Raw_Language_Name_EN}} - {{lan.Raw_Language_Name_Local}}</span>
-                                    </i-option>
-                                </i-select>
-                            </form-item>
-                        </i-col>
-                        <i-col :span="6">
-                            <form-item label="关键词">
-                                <i-input placeholder="关键词：标题、摘要、作者、内容"
-                                         @on-search="doQuery()"
-                                         v-model="form.keyword"
-                                         clearable
-                                         search></i-input>
-                            </form-item>
-                        </i-col>
-                    </row>
-                </i-form>
-            </card>
 
-            <card dis-hover
-                  class="nsc-list margin-top-16"
-                  :bordered="false">
-                <div class="nsc-list-header">
-                    <div class="nsc-list-header-left">
-                        <Dropdown placement="bottom-start"
-                                  trigger="click">
-                            <Button :disabled="selected.length < 1">
-                                批量...
-                                <Icon type="ios-arrow-down"></Icon>
-                            </Button>
-                            <DropdownMenu slot="list">
-                                <DropdownItem @click.native="handleBatchAction('read')">标记已读</DropdownItem>
-                                <DropdownItem @click.native="handleBatchAction('select')">选择</DropdownItem>
-                                <DropdownItem @click.native="handleBatchAction('unselect')">取消选择</DropdownItem>
-                                <DropdownItem @click.native="handleBatchAction('delete')" divided>删除</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                        <Button @click="$router.push('/extraction/create')">
-                            <icon type="md-add"></icon>
-                            新建文章
+        <card dis-hover
+              class="nsc-form"
+              :bordered="false">
+            <i-form label-position="top"
+                    v-model="form">
+                <row :gutter="24">
+                    <i-col :span="6">
+                        <form-item label="采集时间">
+                            <DatePicker type="daterange"
+                                        :options="datepickerOptions"
+                                        v-model="form.extracted_time"
+                                        :clearable="false"
+                                        @on-change="handleDatePickerChange"
+                                        format="yyyy/MM/dd"
+                                        placement="bottom-start"
+                                        split-panels
+                                        placeholder="选择日期范围"
+                                        style="width: 100%;"></DatePicker>
+                        </form-item>
+                    </i-col>
+                    <i-col :span="6">
+                        <form-item label="选择状态">
+                            <i-select v-model="form.selected"
+                                      clearable
+                                      @on-change="doQuery()">
+                                <i-option value="Y">已选</i-option>
+                                <i-option value="N">未选</i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                    <i-col :span="6">
+                        <form-item label="原文语种">
+                            <i-select v-model="form.language"
+                                      clearable
+                                      filterable
+                                      placeholder="选择或者键入关键词过滤"
+                                      @on-change="doQuery()">
+                                <i-option v-for="(lan, key) in languages"
+                                          :key="key"
+                                          :label="lan.Raw_Language_Name_CN"
+                                          :value="lan.Raw_Language_Code">
+                                    <span>{{lan.Raw_Language_Name_CN}}</span>
+                                    <span style="color:#ccc"> - {{lan.Raw_Language_Code}} - {{lan.Raw_Language_Name_EN}} - {{lan.Raw_Language_Name_Local}}</span>
+                                </i-option>
+                            </i-select>
+                        </form-item>
+                    </i-col>
+                    <i-col :span="6">
+                        <form-item label="关键词">
+                            <i-input placeholder="关键词：标题、摘要、作者、内容"
+                                     @on-search="doQuery()"
+                                     v-model="form.keyword"
+                                     clearable
+                                     search></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+            </i-form>
+        </card>
+
+        <card dis-hover
+              class="nsc-list margin-top-16"
+              :bordered="false">
+            <div class="nsc-list-header">
+                <div class="nsc-list-header-left">
+                    <Dropdown placement="bottom-start"
+                              trigger="click">
+                        <Button :disabled="selected.length < 1">
+                            批量...
+                            <Icon type="ios-arrow-down"></Icon>
                         </Button>
-                    </div>
-                    <div class="nsc-list-header-right">
-                    </div>
+                        <DropdownMenu slot="list">
+                            <DropdownItem @click.native="handleBatchAction('read')">标记已读</DropdownItem>
+                            <DropdownItem @click.native="handleBatchAction('select')">选择</DropdownItem>
+                            <DropdownItem @click.native="handleBatchAction('unselect')">取消选择</DropdownItem>
+                            <DropdownItem @click.native="handleBatchAction('delete')" divided>删除</DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                    <Button @click="$router.push('/extraction/create')">
+                        <icon type="md-add"></icon>
+                        新建文章
+                    </Button>
                 </div>
-                <div class="nsc-list-body margin-top-8 margin-bottom-8">
-                    <!--<i-table :columns="columns"
-                             :loading="loading"
-                             :highlight-row
-                             @on-current-change="handleCurrentChange"
-                             :data="listRecords.list"></i-table><br> -->
-
-
-                    <div class="ivu-table-wrapper ivu-table ivu-table-default" style="">
-                        <Spin fix v-if="loading"></Spin>
-                        <table style="width: 100%; border: 0;" cellspacing="0" cellpadding="0">
-                            <thead>
-                            <tr>
-                                <th class="ivu-table-cell ivu-table-column-center" style="width: 50px">
-                                    <checkbox v-model="checkAll"
-                                              @on-change="handleCheckAllChange"></checkbox>
-                                </th>
-                                <th style="width: 12px"></th>
-                                <th class="ivu-table-cell">标题/摘要</th>
-                                <th class="ivu-table-cell" style="width: 120px">来源</th>
-                                <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">采集时间</th>
-                                <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody class="ivu-table-tbody">
-                            <tr v-if="listRecords.list.length === 0">
-                                <td class="ivu-table-column-center" colspan="6">当前条件下没有数据</td>
-                            </tr>
-                            <tr v-for="(article, key) in listRecords.list"
-                                @mouseenter="$set(article, '_showAction', true)"
-                                @mouseleave="$set(article, '_showAction', false)"
-                                :class="getRowClasses(article)"
-                                :key="key">
-                                <td class="ivu-table-cell ivu-table-column-center">
-                                    <checkbox v-model="article._checked"></checkbox>
-                                </td>
-                                <td class="article-info">
-                                    <!--选择状态-->
-                                    <icon v-if="article.Is_Selected === 1"
-                                          type="md-checkmark"></icon>
-                                </td>
-                                <td class="ivu-table-cell ivu-table-cell-ellipsis article-info">
-                                    <!-- 标题、摘要 -->
-                                    <router-link @click.native="handleDetailLinkClick(article)"
-                                                 :to="`/extraction/detail/${article.Article_Detail_ID}`">
-                                        <p>
-                                            <b>{{article.Article_Title}}</b>
-                                            <span v-if="typeof article.Article_Abstract === 'string' && article.Article_Abstract.trim().length > 0"
-                                                  class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
-                                        </p>
-                                    </router-link>
-                                </td>
-                                <td class="ivu-table-cell ivu-table-cell-ellipsis article-info">
-                                    <a :href="article.Article_URL" target="_blank" title="点击在新窗口打开原文">
-                                        <icon type="ios-link"></icon>
-                                        {{article.Article_Source}}
-                                    </a>
-                                </td>
-                                <td class="ivu-table-cell ivu-table-column-center article-info">
-                                    <span>{{article.Extracted_Time}}</span>
-                                </td>
-                                <td class="ivu-table-cell ivu-table-column-center">
-                                    <div v-if="article._showAction">
-                                        <Button size="small"
-                                                title="标记已读"
-                                                @click="doRead([article.Article_Detail_ID])"
-                                                icon="md-eye"></Button>
-                                        <Button size="small"
-                                                v-show="article.Is_Selected !== 1"
-                                                title="选择文章"
-                                                @click="doSelect([article.Article_Detail_ID])"
-                                                icon="md-checkmark"></Button>
-                                        <Button size="small"
-                                                v-show="article.Is_Selected == 1"
-                                                title="取消选择"
-                                                @click="doSelect([article.Article_Detail_ID], false)"
-                                                icon="md-close"></Button>
-                                        <Button size="small"
-                                                title="删除文章"
-                                                @click="doDelete([article.Article_Detail_ID])"
-                                                icon="md-trash"></Button>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
+                <div class="nsc-list-header-right">
                 </div>
-                <div class="nsc-list-footer">
-                    <div class="nsc-list-footer-left">
-                    </div>
-                    <div class="nsc-list-footer-right">
-                        <Page :total="listRecords.total"
-                              style="font-size: 12px;"
-                              :current="form.page_no"
-                              :page-size="form.page_size"
-                              :page-size-opts="pageSizeOptions"
-                              @on-change="doPageChange"
-                              @on-page-size-change="doPageSizeChange"
-                              placement="top"
-                              show-elevator
-                              show-total
-                              show-sizer/>
-                    </div>
+            </div>
+            <div class="nsc-list-body margin-top-8 margin-bottom-8">
+                <div class="ivu-table-wrapper ivu-table ivu-table-default" style="">
+                    <Spin fix v-if="loading"></Spin>
+                    <table style="width: 100%; border: 0;" cellspacing="0" cellpadding="0">
+                        <thead>
+                        <tr>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 50px">
+                                <checkbox v-model="checkAll"
+                                          @on-change="handleCheckAllChange"></checkbox>
+                            </th>
+                            <th style="width: 12px"></th>
+                            <th class="ivu-table-cell">标题/摘要</th>
+                            <th class="ivu-table-cell" style="width: 120px">来源</th>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">采集时间</th>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody class="ivu-table-tbody">
+                        <tr v-if="listRecords.list.length === 0">
+                            <td class="ivu-table-column-center" colspan="6">当前条件下没有数据</td>
+                        </tr>
+                        <tr v-for="(article, key) in listRecords.list"
+                            @mouseenter="$set(article, '_showAction', true)"
+                            @mouseleave="$set(article, '_showAction', false)"
+                            :class="getRowClasses(article)"
+                            :key="key">
+                            <td class="ivu-table-cell ivu-table-column-center">
+                                <checkbox v-model="article._checked"></checkbox>
+                            </td>
+                            <td class="article-info">
+                                <!--选择状态-->
+                                <icon v-if="article.Is_Selected === 1"
+                                      type="md-checkmark"></icon>
+                            </td>
+                            <td class="ivu-table-cell article-info">
+                                <!-- 标题、摘要 -->
+                                <router-link @click.native="handleDetailLinkClick(article)"
+                                             :to="`/extraction/detail/${article.Article_Detail_ID}`">
+                                    <p class="ivu-table-cell-ellipsis">
+                                        <b>{{article.Article_Title}}</b>
+                                        <span v-if="typeof article.Article_Abstract === 'string' && article.Article_Abstract.trim().length > 0"
+                                              class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
+                                    </p>
+                                </router-link>
+                            </td>
+                            <td class="ivu-table-cell ivu-table-cell-ellipsis article-info">
+                                <a :href="article.Article_URL" target="_blank" title="点击在新窗口打开原文">
+                                    <icon type="ios-link"></icon>
+                                    {{article.Article_Source}}
+                                </a>
+                            </td>
+                            <td class="ivu-table-cell ivu-table-column-center article-info">
+                                <span>{{article.Extracted_Time}}</span>
+                            </td>
+                            <td class="ivu-table-cell ivu-table-column-center">
+                                <div v-if="article._showAction">
+                                    <Button size="small"
+                                            title="标记已读"
+                                            @click="doRead([article.Article_Detail_ID])"
+                                            icon="md-eye"></Button>
+                                    <Button size="small"
+                                            v-show="article.Is_Selected !== 1"
+                                            title="选择文章"
+                                            @click="doSelect([article.Article_Detail_ID])"
+                                            icon="md-checkmark"></Button>
+                                    <Button size="small"
+                                            v-show="article.Is_Selected == 1"
+                                            title="取消选择"
+                                            @click="doSelect([article.Article_Detail_ID], false)"
+                                            icon="md-close"></Button>
+                                    <Button size="small"
+                                            title="删除文章"
+                                            @click="doDelete([article.Article_Detail_ID])"
+                                            icon="md-trash"></Button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </card>
-        </div>
-    </layout>
+
+            </div>
+            <div class="nsc-list-footer">
+                <div class="nsc-list-footer-left">
+                </div>
+                <div class="nsc-list-footer-right">
+                    <Page :total="listRecords.total"
+                          style="font-size: 12px;"
+                          :current="form.page_no"
+                          :page-size="form.page_size"
+                          :page-size-opts="pageSizeOptions"
+                          @on-change="doPageChange"
+                          @on-page-size-change="doPageSizeChange"
+                          placement="top"
+                          show-elevator
+                          show-total
+                          show-sizer/>
+                </div>
+            </div>
+        </card>
+    </div>
 </template>
 
 <script>

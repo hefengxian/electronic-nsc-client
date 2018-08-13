@@ -1,5 +1,7 @@
 <template>
-    
+    <div>
+        <h1>Translate</h1>
+    </div>
 </template>
 
 <script>

@@ -1,108 +1,110 @@
 <template>
-    <layout>
-        <div slot="nav-left">
-            <Breadcrumb>
-                <BreadcrumbItem>
-                    <icon type="md-create"></icon>
-                    编辑文章
-                </BreadcrumbItem>
-            </Breadcrumb>
+    <div>
+        <div class="nsc-body-right-nav">
+            <div class="nsc-body-right-nav-left">
+                <Breadcrumb>
+                    <BreadcrumbItem>
+                        <icon type="md-create"></icon>
+                        编辑文章
+                    </BreadcrumbItem>
+                </Breadcrumb>
+            </div>
+            <div class="nsc-body-right-nav-right"></div>
         </div>
-        <div slot="body-right">
-            <card dis-hover
-                  class="create-article"
-                  :bordered="false">
-                <i-form ref="create-form"
-                        :rules="validateRule"
-                        :model="article"
-                        :label-width="80">
+
+        <card dis-hover
+              class="create-article"
+              :bordered="false">
+            <i-form ref="create-form"
+                    :rules="validateRule"
+                    :model="article"
+                    :label-width="80">
+                <row>
+                    <i-col span="22">
+                        <form-item label="标题" prop="article_title">
+                            <i-input v-model="article.Article_Title"
+                                     placeholder="文章标题"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+
+                <row>
+                    <i-col span="8">
+                        <form-item label="原文网址" prop="article_url">
+                            <i-input v-model="article.Article_URL"
+                                     placeholder=""></i-input>
+                        </form-item>
+                    </i-col>
+                    <i-col span="8">
+                        <form-item label="来源" prop="article_source">
+                            <i-input v-model="article.Article_Source"
+                                     placeholder="文章来源，例如：BBC News"></i-input>
+                        </form-item>
+                    </i-col>
+                    <i-col span="6">
+                        <form-item label="作者">
+                            <i-input v-model="article.Article_Author"
+                                     placeholder="文章作者，不填则自动为当前登录用户"></i-input>
+                        </form-item>
+                    </i-col>
+                </row>
+
+
+                <form-item label="其他选项">
+                    <row type="flex">
+                        <i-col span="22">
+                            <a href="javascript:;"
+                               style="text-decoration: none;"
+                               @click="showCollapse = !showCollapse"> {{showCollapse ? '收起' : '展开'}}
+                                <icon :type="showCollapse ? 'ios-arrow-up' : 'ios-arrow-down'"></icon>
+                            </a>
+                        </i-col>
+                    </row>
+                </form-item>
+
+                <!-- 文章摘要 -->
+                <form-item label="摘要" v-if="showCollapse">
                     <row>
                         <i-col span="22">
-                            <form-item label="标题" prop="article_title">
-                                <i-input v-model="article.Article_Title"
-                                         placeholder="文章标题"></i-input>
-                            </form-item>
+                            <i-input v-model="article.Article_Abstract"
+                                     type="textarea"
+                                     placeholder="摘要"></i-input>
                         </i-col>
                     </row>
+                </form-item>
 
-                    <row>
-                        <i-col span="8">
-                            <form-item label="原文网址" prop="article_url">
-                                <i-input v-model="article.Article_URL"
-                                         placeholder=""></i-input>
-                            </form-item>
-                        </i-col>
-                        <i-col span="8">
-                            <form-item label="来源" prop="article_source">
-                                <i-input v-model="article.Article_Source"
-                                         placeholder="文章来源，例如：BBC News"></i-input>
-                            </form-item>
-                        </i-col>
-                        <i-col span="6">
-                            <form-item label="作者">
-                                <i-input v-model="article.Article_Author"
-                                         placeholder="文章作者，不填则自动为当前登录用户"></i-input>
-                            </form-item>
+                <form-item label="正文" prop="article_content">
+                    <row type="flex">
+                        <i-col span="22">
+                            <editor v-model="article.Article_Content"
+                                    @ready="handleEditorReady"
+                                    :options="editorOptions"></editor>
                         </i-col>
                     </row>
+                </form-item>
 
+                <!--<form-item label="附件">
+                    <upload action="//jsonplaceholder.typicode.com/posts/">
+                        <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
+                    </upload>
+                </form-item>-->
 
-                    <form-item label="其他选项">
-                        <row type="flex">
-                            <i-col span="22">
-                                <a href="javascript:;"
-                                   style="text-decoration: none;"
-                                   @click="showCollapse = !showCollapse"> {{showCollapse ? '收起' : '展开'}}
-                                    <icon :type="showCollapse ? 'ios-arrow-up' : 'ios-arrow-down'"></icon>
-                                </a>
-                            </i-col>
-                        </row>
-                    </form-item>
-
-                    <!-- 文章摘要 -->
-                    <form-item label="摘要" v-if="showCollapse">
-                        <row>
-                            <i-col span="22">
-                                <i-input v-model="article.Article_Abstract"
-                                         type="textarea"
-                                         placeholder="摘要"></i-input>
-                            </i-col>
-                        </row>
-                    </form-item>
-
-                    <form-item label="正文" prop="article_content">
-                        <row type="flex">
-                            <i-col span="22">
-                                <editor v-model="article.Article_Content"
-                                        @ready="handleEditorReady"
-                                        :options="editorOptions"></editor>
-                            </i-col>
-                        </row>
-                    </form-item>
-
-                    <!--<form-item label="附件">
-                        <upload action="//jsonplaceholder.typicode.com/posts/">
-                            <Button type="ghost" icon="ios-cloud-upload-outline">上传文件</Button>
-                        </upload>
-                    </form-item>-->
-
-                    <form-item style="margin-bottom: 0;">
-                        <row :gutter="16">
-                            <i-col span="4">
-                                <i-button type="primary"
-                                          @click="handleSubmit('create-form')"
-                                          long>保 存
-                                </i-button>
-                            </i-col>
-                            <i-col span="20">
-                                <i-button @click="$router.push(`/extraction/detail/${article.Article_Detail_ID}`)">放弃</i-button>
-                            </i-col>
-                        </row>
-                    </form-item>
-                </i-form>
-            </card>
-        </div>
-    </layout>
+                <form-item style="margin-bottom: 0;">
+                    <row :gutter="16">
+                        <i-col span="4">
+                            <i-button type="primary"
+                                      @click="handleSubmit('create-form')"
+                                      long>保 存
+                            </i-button>
+                        </i-col>
+                        <i-col span="20">
+                            <i-button @click="$router.push(`/extraction/detail/${article.Article_Detail_ID}`)">放弃</i-button>
+                        </i-col>
+                    </row>
+                </form-item>
+            </i-form>
+        </card>
+    </div>
 </template>
 
 <script>

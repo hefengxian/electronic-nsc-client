@@ -26,4 +26,7 @@ export default {
     translate(data) {
         return api.doRequest(PREFIX + 'translate', api.POST, null, data)
     },
+    status(data) {
+        return api.doRequest(PREFIX + 'status', api.PUT, null, data)
+    },
 }

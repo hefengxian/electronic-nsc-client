@@ -60,16 +60,7 @@
                 </ul>
             </div>
             <div class="nsc-body-right">
-                <!--  -->
-                <div class="nsc-body-right-nav">
-                    <div class="nsc-body-right-nav-left">
-                        <slot name="nav-left"></slot>
-                    </div>
-                    <div class="nsc-body-right-nav-right">
-                        <slot name="nav-right"></slot>
-                    </div>
-                </div>
-                <slot name="body-right"></slot>
+                <slot></slot>
             </div>
         </div>
     </div>

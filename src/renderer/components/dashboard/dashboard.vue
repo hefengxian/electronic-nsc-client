@@ -1,49 +1,51 @@
 <template>
     <layout>
-        <div slot="nav-left">
-            <Breadcrumb>
-                <BreadcrumbItem>
-                    <icon type="ios-analytics"></icon>
-                    主页
-                </BreadcrumbItem>
-            </Breadcrumb>
+        <div class="nsc-body-right-nav">
+            <div class="nsc-body-right-nav-left">
+                <Breadcrumb>
+                    <BreadcrumbItem>
+                        <icon type="ios-analytics"></icon>
+                        主页
+                    </BreadcrumbItem>
+                </Breadcrumb>
+            </div>
+            <div class="nsc-body-right-nav-right"></div>
         </div>
-        <div slot="body-right">
-            <row :gutter="16" style="color: #fff; text-align: center;">
-                <i-col :span="4" v-for="(stat, key) in personalStats" :key="key">
-                    <card dis-hover
-                          :bordered="false"
-                          :style="{'background-color': stat.color}">
-                        <div>
-                            <h1>{{opData[stat.code]}}</h1>
-                            <p style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">
-                                <icon :type="stat.icon"></icon>
-                                {{stat.label}}
-                            </p>
-                        </div>
-                    </card>
-                </i-col>
-            </row>
 
-            <row :gutter="16" class="margin-top-24">
-                <i-col :span="16">
-                    <card dis-hover
-                          :bordered="false">
-                        <b slot="title">最近7天处理文章趋势（采集包括新建）</b>
-                        <div id="trend" style="height: 300px;">
+        <row :gutter="16" style="color: #fff; text-align: center;">
+            <i-col :span="4" v-for="(stat, key) in personalStats" :key="key">
+                <card dis-hover
+                      :bordered="false"
+                      :style="{'background-color': stat.color}">
+                    <div>
+                        <h1>{{opData[stat.code]}}</h1>
+                        <p style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">
+                            <icon :type="stat.icon"></icon>
+                            {{stat.label}}
+                        </p>
+                    </div>
+                </card>
+            </i-col>
+        </row>
 
-                        </div>
-                    </card>
-                </i-col>
-                <i-col :span="8">
-                    <card dis-hover
-                          :bordered="false">
-                        <strong slot="title">各项操作占比</strong>
-                        <div id="percent" style="height: 300px"></div>
-                    </card>
-                </i-col>
-            </row>
-        </div>
+        <row :gutter="16" class="margin-top-24">
+            <i-col :span="16">
+                <card dis-hover
+                      :bordered="false">
+                    <b slot="title">最近7天处理文章趋势（采集包括新建）</b>
+                    <div id="trend" style="height: 300px;">
+
+                    </div>
+                </card>
+            </i-col>
+            <i-col :span="8">
+                <card dis-hover
+                      :bordered="false">
+                    <strong slot="title">各项操作占比</strong>
+                    <div id="percent" style="height: 300px"></div>
+                </card>
+            </i-col>
+        </row>
     </layout>
 </template>
 
