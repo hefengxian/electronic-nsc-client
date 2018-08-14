@@ -48,7 +48,7 @@
                     </i-col>
                     <i-col :span="4">
                         <form-item label="用户组">
-                            <i-select v-model="form.Group_ID"
+                            <i-select v-model="form.Translate_User_Group_ID"
                                       clearable
                                       @on-change="doQuery()">
                                 <i-option v-for="(group, key) in groups"
@@ -61,7 +61,7 @@
                     </i-col>
                     <i-col :span="4">
                         <form-item label="翻译人员">
-                            <i-select v-model="form.User_ID"
+                            <i-select v-model="form.Translate_User_ID"
                                       clearable
                                       filterable
                                       placeholder="键入关键词过滤"
@@ -211,8 +211,8 @@
                 form: {
                     Translate_Status: '',
                     Raw_Language_Code: '',
-                    User_ID: '',
-                    Group_ID: '',
+                    Translate_User_ID: '',
+                    Translate_User_Group_ID: '',
                     keyword: '',
                     page_no: 1,
                     page_size: 10,

@@ -3,10 +3,7 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem>
-                        <icon type="md-swap"></icon>
-                        待译库
-                    </BreadcrumbItem>
+                    <BreadcrumbItem to="/proofreading"><icon type="md-done-all"></icon> 待校库</BreadcrumbItem>
                 </Breadcrumb>
             </div>
             <div class="nsc-body-right-nav-right"></div>
@@ -23,9 +20,9 @@
                             <i-select v-model="form.Translate_Status"
                                       clearable
                                       @on-change="doQuery()">
-                                <i-option value="TN">待翻译</i-option>
-                                <i-option value="TW">翻译中</i-option>
-                                <i-option value="TF">已翻译</i-option>
+                                <i-option value="TF">待校对</i-option>
+                                <i-option value="RW">校对中</i-option>
+                                <i-option value="RF">已校对</i-option>
                             </i-select>
                         </form-item>
                     </i-col>
@@ -73,13 +70,13 @@
                                           :key="key"
                                           :label="user.User_Name"
                                           :value="user.User_ID">
-                                    </i-option>
+                                </i-option>
                             </i-select>
                         </form-item>
                     </i-col>
                     <i-col :span="8">
                         <form-item label="关键词">
-                            <i-input placeholder="关键词：标题、摘要、作者"
+                            <i-input placeholder="关键词：译文标题"
                                      @on-search="doQuery()"
                                      v-model="form.keyword"
                                      clearable
@@ -106,9 +103,9 @@
                         <thead>
                         <tr>
                             <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">入库时间</th>
-                            <th class="ivu-table-cell ivu-table-column-center" style="width: 80px">时限</th>
-                            <th class="ivu-table-cell">标题/摘要</th>
+                            <th class="ivu-table-cell">译文标题</th>
                             <th class="ivu-table-cell" style="width: 150px">翻译员</th>
+                            <th class="ivu-table-cell" style="width: 150px">校对员</th>
                             <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">操作</th>
                         </tr>
                         </thead>
@@ -120,22 +117,17 @@
                             :key="key">
                             <td class="ivu-table-cell ivu-table-column-center">
                                 <!-- 入库时间 -->
-                                <span :style="getTimeoutStyle(article)">{{calcPassTime(article)}}</span>
+                                <span>{{calcPassTime(article)}}</span>
                                 <br>
-                                <span>{{article['Selected_Time']}}</span>
+                                <span>{{article['Translate_End_Time']}}</span>
                             </td>
-
-                            <!-- 时限 -->
-                            <td class="ivu-table-cell ivu-table-column-center">{{calcTime(article)}}</td>
 
                             <!-- 标题、摘要 -->
                             <td class="ivu-table-cell article-info">
                                 <router-link @click.native="handleDetailLinkClick(article)"
-                                             :to="`/translation/detail/${article.Article_Translate_ID}`">
+                                             :to="`/proofreading/detail/${article.Article_Translate_ID}`">
                                     <p class="ivu-table-cell-ellipsis">
-                                        <b>{{article.Article_Title}}</b>
-                                        <span v-if="typeof article.Article_Abstract === 'string' && article.Article_Abstract.trim().length > 0"
-                                              class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
+                                        <b>{{article.Translate_Title}}</b>
                                     </p>
                                 </router-link>
                             </td>
@@ -143,28 +135,34 @@
                             <!-- 翻译员 -->
                             <td class="ivu-table-cell">{{article.Translate_User_Name}}</td>
 
+                            <!-- 校对员 -->
+                            <td class="ivu-table-cell">{{article.Translate_User_Name}}</td>
+
                             <!-- 操作 -->
                             <td class="ivu-table-cell ivu-table-column-center">
                                 <div>
                                     <i-button size="small"
-                                              v-if="article.Translate_Status == 'TN'"
-                                              title="开始翻译"
-                                              @click="startTranslate(article)"
-                                              icon="md-swap">开始翻译</i-button>
+                                              v-if="article.Translate_Status === 'TF'"
+                                              title="开始校对"
+                                              @click="startAudit(article)"
+                                              icon="md-done-all">开始校对
+                                    </i-button>
                                     <i-button size="small"
-                                              v-if="article.Translate_Status == 'TW'"
-                                              title="正在翻译"
-                                              :disabled="cu.User_ID != article.Translate_User_ID"
+                                              v-if="article.Translate_Status === 'RW'"
+                                              title="正在校对"
+                                              :disabled="cu.User_ID !== article.Review_User_ID"
                                               type="info"
-                                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                                              icon="md-lock">正在翻译</i-button>
+                                              @click="$router.push(`/proofreading/proofread/${article['Article_Translate_ID']}`)"
+                                              icon="md-lock">正在校对
+                                    </i-button>
                                     <i-button size="small"
-                                              v-if="['TF','AW','AF','RW','RF'].indexOf(article.Translate_Status) > -1"
-                                              title="翻译完成"
-                                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                                              :disabled="cu.User_ID != article.Translate_User_ID || article.Translate_Status != 'TF'"
+                                              v-if="['AW','AF','RF'].indexOf(article.Translate_Status) > -1"
+                                              title="校对完成"
+                                              @click="$router.push(`/proofreading/proofread/${article['Article_Translate_ID']}`)"
+                                              :disabled="cu.User_ID !== article.Review_User_ID || article.Translate_Status !== 'RF'"
                                               type="success"
-                                              icon="md-checkmark"> 翻译完成</i-button>
+                                              icon="md-checkmark"> 校对完成
+                                    </i-button>
                                 </div>
                             </td>
                         </tr>
@@ -201,7 +199,7 @@
     moment.locale('zh-cn')
 
     export default {
-        data () {
+        data() {
             return {
                 cu: this.$localStore.getItem(this.$localStore.Keys.USER_KEY),   // 当前登录用户
                 loading: false,
@@ -228,9 +226,17 @@
                 }
             }
         },
-        computed: {
-        },
-        mounted () {
+        computed: {},
+        created() {
+            Promise.all([
+                this.$api.system.languages(),
+                this.$api.system.groups(),
+                this.$api.system.users(),
+            ]).then(resp => {
+                this.languages = resp[0].data.list
+                this.groups = resp[1].data
+                this.users = resp[2].data.list
+            })
         },
         methods: {
             /**
@@ -238,14 +244,14 @@
              *
              * @param {boolean} reset 是否重置分页
              */
-            doQuery (reset = true) {
+            doQuery(reset = true) {
                 if (reset) {
                     this.form.page_no = 1
                 }
 
                 let params = {...this.form}
                 this.loading = true
-                this.$api.translation.articles(params).then(resp => {
+                this.$api.proofreading.articles(params).then(resp => {
                     this.loading = false
                     this.listRecords = resp.data
                 })
@@ -257,7 +263,7 @@
              *
              * @param {int} size 分页大小
              */
-            doPageSizeChange (size) {
+            doPageSizeChange(size) {
                 this.form.page_size = size
                 this.doQuery(false)
             },
@@ -267,7 +273,7 @@
              *
              * @param {int} current 当前页码
              */
-            doPageChange (current) {
+            doPageChange(current) {
                 this.form.page_no = current
                 this.doQuery(false)
             },
@@ -278,7 +284,7 @@
              *
              * @param {object} article 当前点击的文章
              */
-            handleDetailLinkClick (article) {
+            handleDetailLinkClick(article) {
             },
 
 
@@ -288,71 +294,39 @@
              * @param {object} article 当前文章
              * @returns {string}
              */
-            calcPassTime (article) {
-                return moment(article['Selected_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
+            calcPassTime(article) {
+                return moment(article['Translate_End_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
             },
 
-            /**
-             * 给定秒数，计算多少天，多少小时，多少分钟
-             *
-             * @param {object} article 秒数
-             * @returns {string}
-             */
-            calcTime (article) {
-                let seconds = article['Translate_Plan_End_Time']
-                let duration = moment.duration(Number(seconds), 'seconds')
-                let result = ''
-                if (duration.days() > 0) {
-                    result += `${duration.days()}天`
-                }
-                if (duration.hours() > 0) {
-                    result += `${duration.hours()}小时`
-                }
-                if (duration.minutes() > 0) {
-                    result += `${duration.minutes()}分钟`
-                }
-                return result
-            },
 
             /**
-             * 获取是否超时的颜色
-             *
-             * @param {object} article
-             * @returns {{color: string}}
-             */
-            getTimeoutStyle (article) {
-                let selectTime = moment(article['Selected_Time'], 'YYYY-MM-DD HH:mm:ss')
-                let durationSeconds = moment().diff(selectTime, 'seconds')
-                let isTimeout = article['Translate_Plan_End_Time'] < durationSeconds
-                return {
-                    color: isTimeout ? '#ed4014' : '#19be6b',
-                }
-            },
-
-            /**
-             * 处理点击开始翻译的按钮
+             * 处理点击开始校对的按钮
              *
              * @param {object} article 当前文章
              */
-            startTranslate(article) {
+            startAudit(article) {
                 let params = {
                     Article_Translate_ID: article.Article_Translate_ID,
-                    Translate_Status: 'TW',
+                    Translate_Status: 'RW',
                 }
-                this.$api.translation.status(params).then(resp => {
+                this.$api.proofreading.status(params).then(resp => {
                     let data = resp.data
                     if (data.error) {
                         this.$Message.error(data.error.message)
                     } else {
                         // 跳转到翻译界面
-                        this.$router.push(`/translation/translate/${params.Article_Translate_ID}`)
+                        this.$router.push(`/proofreading/proofread/${params.Article_Translate_ID}`)
                     }
                 }).catch(err => {
 
                 })
             },
 
-
+            /**
+             * 获取用户列表，Select 控件使用
+             *
+             * @param keyword
+             */
             getUserList(keyword) {
                 this.userListLoading = true
                 this.$api.system.users({keyword}).then(resp => {
@@ -363,19 +337,9 @@
 
         },
         components: {
-            layout: require('../common/layout').default
         },
-        beforeRouteEnter (to, from, next) {
+        beforeRouteEnter(to, from, next) {
             next(vm => {
-                Promise.all([
-                    vm.$api.system.languages(),
-                    vm.$api.system.groups(),
-                    vm.$api.system.users(),
-                ]).then(resp => {
-                    vm.languages = resp[0].data.list
-                    vm.groups = resp[1].data
-                    vm.users = resp[2].data.list
-                })
                 vm.doQuery(false)
             })
         },

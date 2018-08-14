@@ -12,6 +12,11 @@ import publicApi from './public-api'
 import system from './system-api'
 import extraction from './extraction-api'
 import translation from './translation-api'
+import proofreading from './proofreading-api'
+import audit from './audit-api'
+import finished from './finished-api'
+import management from './management-api'
+import personal from './personal-api'
 
 const api = {
     ...apiClient,
@@ -20,6 +25,11 @@ const api = {
     system,
     extraction,
     translation,
+    proofreading,
+    audit,
+    finished,
+    management,
+    personal,
 }
 
 export default {

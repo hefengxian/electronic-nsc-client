@@ -21,6 +21,7 @@ export default new Router({
             // component: require('../components/dashboard/dashboard').default
             component: () => import('../components/dashboard/dashboard')
         },
+        // 采集库
         {
             path: '/extraction',
             component: () => import('../components/extraction/route'),
@@ -43,6 +44,7 @@ export default new Router({
                 },
             ],
         },
+        // 待译库
         {
             path: '/translation',
             component: () => import('../components/translation/route'),
@@ -58,6 +60,59 @@ export default new Router({
                 {
                     path: 'translate/:id',
                     component: () => import('../components/translation/translate'),
+                },
+            ],
+        },
+        // 待校库
+        {
+            path: '/proofreading',
+            component: () => import('../components/proofreading/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/proofreading/list'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('../components/proofreading/detail'),
+                },
+                {
+                    path: 'proofread/:id',
+                    component: () => import('../components/proofreading/proofread'),
+                },
+            ],
+        },
+        // 待编库
+        {
+            path: '/audit',
+            component: () => import('../components/audit/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/audit/list'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('../components/audit/detail'),
+                },
+                {
+                    path: 'audit/:id',
+                    component: () => import('../components/audit/audit'),
+                },
+            ],
+        },
+        // 成稿库
+        {
+            path: '/finished',
+            component: () => import('../components/finished/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/finished/list'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('../components/finished/detail'),
                 },
             ],
         },

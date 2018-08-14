@@ -8,15 +8,9 @@
 
 import api from './api-client'
 
-const PREFIX = '/v1/translation/'
+const PREFIX = '/v1/proofreading/'
 
 export default {
-    list(params) {
-        return api.doRequest(PREFIX + 'list', api.GET, params)
-    },
-    count(params) {
-        return api.doRequest(PREFIX + 'count', api.GET, params)
-    },
     articles(params) {
         return api.doRequest(PREFIX + 'articles', api.GET, params)
     },

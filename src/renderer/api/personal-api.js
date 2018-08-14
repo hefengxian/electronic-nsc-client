@@ -23,6 +23,9 @@ export default {
     detail(params) {
         return api.doRequest(PREFIX + 'detail', api.GET, params)
     },
+    translate(data) {
+        return api.doRequest(PREFIX + 'translate', api.POST, null, data)
+    },
     status(data) {
         return api.doRequest(PREFIX + 'status', api.PUT, null, data)
     },

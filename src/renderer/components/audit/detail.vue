@@ -99,22 +99,6 @@
                                 <td>{{item.label}}:</td>
                                 <td v-html="item.value"></td>
                             </tr>
-                            <tr>
-                                <td>校对评分:</td>
-                                <td>
-                                    <Rate allow-half
-                                          disabled
-                                          style="font-size: 12px"
-                                          :value="article.Translate_Score_By_Review ? article.Translate_Score_By_Review : 0" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>编辑评分:</td>
-                                <td><Rate allow-half
-                                          disabled
-                                          style="font-size: 12px"
-                                          :value="article.Translate_Score_By_Audit ? article.Translate_Score_By_Audit : 0" /></td>
-                            </tr>
                         </table>
                     </card>
                     <card dis-hover :bordered="false" class="margin-top-16">
