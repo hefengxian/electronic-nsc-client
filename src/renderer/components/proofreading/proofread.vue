@@ -8,10 +8,11 @@
                         <icon type="md-done-all"></icon>
                         待校库
                     </BreadcrumbItem>
-                    <BreadcrumbItem>
+                    <BreadcrumbItem :to="`/proofreading/detail/${$route.params.id}`">
                         <icon type="md-done-all"></icon>
-                        校对
+                        校对译文
                     </BreadcrumbItem>
+                    <BreadcrumbItem>{{article ? article.Article_Title : ''}}</BreadcrumbItem>
                 </Breadcrumb>
             </div>
             <div class="nsc-body-right-nav-right"></div>
@@ -229,7 +230,7 @@
                 let reqData = {
                     Article_Translate_ID: this.$route.params.id,
                     Review_Title: this.translateArticle.title,
-                    Review_Content: this.translateArticle.content,
+                    Review_Content: this.translateArticle.content.replace("<p><br></p>", ""),
                     Score: this.translateArticle.score,
                     Character_Count: this.characterCount,
                 }
@@ -273,7 +274,7 @@
                     Article_Translate_ID: this.article.Article_Translate_ID,
                     Translate_Status: 'RF',
                 }
-                this.$api.translation.status(params).then(resp => {
+                this.$api.proofreading.status(params).then(resp => {
                     let data = resp.data
                     if (data.error) {
                         this.$Message.error(data.error.message)

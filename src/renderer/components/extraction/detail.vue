@@ -4,6 +4,10 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
+                    <BreadcrumbItem to="/extraction">
+                        <icon type="md-download"></icon>
+                        采集库
+                    </BreadcrumbItem>
                     <BreadcrumbItem>
                         <icon type="md-paper"></icon>
                         原文详情
@@ -44,8 +48,8 @@
                         <i-button @click="handleActions('delete')" icon="md-trash">删除</i-button>
                         <i-select style="width: 200px"
                                   @on-change="handleOnUserChange"
-                                  @on-clear="handleOnUserChange"
                                   clearable
+                                  v-model="translateUserID"
                                   :disabled="article.Is_Selected !== 1"
                                   placeholder="指定翻译人员">
                             <i-option v-for="(user, key) in currentGroupUser"
@@ -109,6 +113,7 @@
                 error: null,
                 article: null,
                 currentGroupUser: [],
+                translateUserID: '',
                 counter: {
                     all: 0,
                     characters: 0,
@@ -213,6 +218,7 @@
                 this.$api.extraction.detail({id}).then(resp => {
                     this.loading = false
                     this.article = resp.data
+                    this.translateUserID = resp.data.Translate_User_ID ? resp.data.Translate_User_ID : ''
                     this.$nextTick(() => {
                         let el = document.getElementById('article-content')
                         if (el) {
@@ -270,12 +276,32 @@
                 }
             },
 
+            /**
+             * 指定翻译人
+             *
+             * @param val 选择框的值
+             */
             handleOnUserChange(val) {
-                console.log(val)
+                if (this.article.Article_Translate_ID) {
+                    let params = {
+                        Article_Translate_ID: this.article.Article_Translate_ID,
+                        Translate_Status: val ? 'TW' : 'TN',
+                        User_ID: val ? val : this.article.Translate_User_ID,
+                    }
+                    // 调用开始翻译接口
+                    this.$api.translation.status(params).then(resp => {
+                        let data = resp.data
+                        if (data.error) {
+                            this.$Message.error(data.error.message)
+                        } else {
+                            this.$Message.success(val ? '设置成功' : '取消成功')
+                            this.getArticle()
+                        }
+                    }).catch(err => {
+                        this.$Message.error('设置失败')
+                    })
+                }
             }
-        },
-        components: {
-            layout: require('../common/layout').default,
         },
         beforeRouteEnter(to, from, next) {
             next(vm => {

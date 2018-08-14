@@ -3,10 +3,15 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem>
+                    <BreadcrumbItem to="/extraction">
+                        <icon type="md-download"></icon>
+                        采集库
+                    </BreadcrumbItem>
+                    <BreadcrumbItem :to="`/extraction/detail/${$route.params.id}`">
                         <icon type="md-create"></icon>
                         编辑文章
                     </BreadcrumbItem>
+                    <BreadcrumbItem>{{article.Article_Title}}</BreadcrumbItem>
                 </Breadcrumb>
             </div>
             <div class="nsc-body-right-nav-right"></div>
@@ -221,8 +226,8 @@
             },
             doSubmit () {
                 let params = {...this.article}
+                params['Article_Content'].replace("<p><br></p>", "")
                 this.$api.extraction.edit(params).then(resp => {
-                    console.log('resp', resp)
                     // 返回列表
                     this.$Message.info('保存成功！')
                     this.$router.push(`/extraction/detail/${params.Article_Detail_ID}`)

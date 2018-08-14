@@ -4,6 +4,10 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
+                    <BreadcrumbItem to="/translation">
+                        <icon type="md-swap"></icon>
+                        待译库
+                    </BreadcrumbItem>
                     <BreadcrumbItem>
                         <icon type="md-paper"></icon>
                         译文详情

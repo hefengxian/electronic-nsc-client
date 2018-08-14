@@ -136,7 +136,7 @@
                             <td class="ivu-table-cell">{{article.Translate_User_Name}}</td>
 
                             <!-- 校对员 -->
-                            <td class="ivu-table-cell">{{article.Translate_User_Name}}</td>
+                            <td class="ivu-table-cell">{{article.Review_User_Name}}</td>
 
                             <!-- 操作 -->
                             <td class="ivu-table-cell ivu-table-column-center">

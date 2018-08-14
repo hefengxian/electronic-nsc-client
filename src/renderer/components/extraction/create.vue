@@ -4,6 +4,10 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
+                    <BreadcrumbItem to="/extraction">
+                        <icon type="md-download"></icon>
+                        采集库
+                    </BreadcrumbItem>
                     <BreadcrumbItem>
                         <icon type="md-add"></icon>
                         创建文章
@@ -206,6 +210,7 @@
             },
             doSubmit () {
                 let params = {...this.article}
+                params['article_content'].replace("<p><br></p>", "")
                 this.$api.extraction.create(params).then(resp => {
                     // 返回列表
                     this.$Message.info('保存成功！')

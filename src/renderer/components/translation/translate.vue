@@ -4,10 +4,15 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem>
+                    <BreadcrumbItem to="/translation">
+                        <icon type="md-swap"></icon>
+                        待译库
+                    </BreadcrumbItem>
+                    <BreadcrumbItem :to="`/translation/detail/${$route.params.id}`">
                         <icon type="md-swap"></icon>
                         翻译
                     </BreadcrumbItem>
+                    <breadcrumb-item>{{article ? article['Article_Title'] : ''}}</breadcrumb-item>
                 </Breadcrumb>
             </div>
             <div class="nsc-body-right-nav-right"></div>
@@ -207,7 +212,7 @@
                 let reqData = {
                     Article_Translate_ID: this.$route.params.id,
                     Translate_Title: this.translateArticle['Translate_Title'],
-                    Translate_Content: this.translateArticle['Translate_Content']
+                    Translate_Content: this.translateArticle['Translate_Content'].replace(/<p><br><\/p>/g, "")
                 }
                 this.$api.translation.save(reqData).then(resp => {
                     this.saveStatus = '已保存'

@@ -474,9 +474,6 @@
                 }
             }
         },
-        components: {
-            layout: require('../common/layout').default
-        },
         beforeRouteEnter (to, from, next) {
             next(vm => {
                 vm.$api.system.languages().then(resp => {
