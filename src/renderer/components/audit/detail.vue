@@ -4,6 +4,10 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
+                    <BreadcrumbItem to="/audit">
+                        <icon type="md-create"></icon>
+                        待编库
+                    </BreadcrumbItem>
                     <BreadcrumbItem>
                         <icon type="md-paper"></icon>
                         译文详情
@@ -19,19 +23,19 @@
                   :bordered="false">
                 <div>
                     <!-- 开始翻译 -->
-                    <i-button v-if="article['Translate_Status'] === 'TN'"
-                              @click="startTranslate(article)"
-                              icon="md-swap">开始翻译</i-button>
+                    <i-button v-if="article['Translate_Status'] === 'RF'"
+                              @click="start(article)"
+                              icon="md-create">开始编辑</i-button>
 
                     <!-- 继续翻译 -->
-                    <i-button v-if="article['Translate_Status'] === 'TW' && cu['User_ID'] === article['Translate_User_ID']"
-                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                              icon="md-swap">继续翻译</i-button>
+                    <i-button v-if="article['Translate_Status'] === 'AW' && cu['User_ID'] === article['Audit_User_ID']"
+                              @click="$router.push(`/audit/audit/${article['Article_Translate_ID']}`)"
+                              icon="md-create">继续编辑</i-button>
 
                     <!-- 修改翻译 -->
-                    <i-button v-if="article['Translate_Status'] === 'TF' && cu['User_ID'] === article['Translate_User_ID']"
-                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                              icon="md-create">修改翻译</i-button>
+                    <i-button v-if="article['Translate_Status'] === 'AF' && cu['User_ID'] === article['Audit_User_ID']"
+                              @click="$router.push(`/audit/audit/${article['Article_Translate_ID']}`)"
+                              icon="md-create">修改编辑</i-button>
 
                     <!-- 显示原文 -->
                     <i-button @click="isShowRawArticle = !isShowRawArticle"
@@ -42,8 +46,7 @@
             <div style="display: flex;" class="margin-top-16">
                 <row :gutter="16" style="flex: 1;">
                     <!-- 原文 -->
-                    <i-col :span="isShowTranInfo ? 12 : 24"
-                           v-show="isShowRawArticle">
+                    <i-col span="12" v-show="isShowRawArticle">
                         <card dis-hover :bordered="false">
                             <!-- 标题 -->
                             <div slot="title" ><icon type="md-paper"></icon> 原文</div>
@@ -60,17 +63,17 @@
                     </i-col>
 
                     <!-- 译文（如果有的话） -->
-                    <i-col v-if="isShowTranInfo" :span="isShowRawArticle ? 12 : 24">
+                    <i-col :span="isShowRawArticle ? 12 : 24">
                         <card dis-hover :bordered="false">
                             <!-- 标题 -->
                             <div slot="title"><icon type="md-paper"></icon> 译文</div>
 
                             <div class="content">
                                 <div class="article-detail">
-                                    <p class="article-title">{{article.Translate_Title}}</p>
+                                    <p class="article-title">{{article['Translate_Status'] === 'RF' ? article.Review_Title : article.Audit_Title}}</p>
                                     <div class="article-content"
                                          id="translate-content"
-                                         v-html="article.Translate_Content"></div>
+                                         v-html="article['Translate_Status'] === 'RF' ? article.Review_Content : article.Audit_Content"></div>
                                 </div>
                             </div>
                         </card>
@@ -90,7 +93,7 @@
                             </tr>
                         </table>
                     </card>
-                    <card dis-hover :bordered="false" class="margin-top-16" v-if="isShowTranInfo">
+                    <card dis-hover :bordered="false" class="margin-top-16">
                         <div slot="title"><Icon type="md-information-circle" /> 译文信息</div>
                         <table>
                             <tr v-for="(item, key) in tranArticleInfo"
@@ -98,6 +101,20 @@
                                 :key="key">
                                 <td>{{item.label}}:</td>
                                 <td v-html="item.value"></td>
+                            </tr>
+                            <tr>
+                                <td>校对评分:</td>
+                                <td>
+                                    <Rate disabled
+                                          style="font-size: 12px"
+                                          :value="article.Translate_Score_By_Review ? article.Translate_Score_By_Review : 0" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>编辑评分:</td>
+                                <td><Rate disabled
+                                          style="font-size: 12px"
+                                          :value="article.Translate_Score_By_Audit ? article.Translate_Score_By_Audit : 0" /></td>
                             </tr>
                         </table>
                     </card>
@@ -148,10 +165,6 @@
             }
         },
         computed: {
-            // 是否显示译文信息
-            isShowTranInfo() {
-                return this.article['Translate_Status'] !== 'TN'
-            },
             // 原文信息
             rawArticleInfo() {
                 let a = this.article,
@@ -266,31 +279,56 @@
                         value: a['Translate_End_Time'] ? a['Translate_End_Time'] : '',
                     },
                     {
-                        label: '最后更新',
+                        label: '校对',
                         title: '',
-                        value: a['Translate_Last_Update_Time'] ? a['Translate_Last_Update_Time'] : '',
+                        value: a['Review_User_Name'] ? a['Review_User_Name'] : '',
+                    },
+                    {
+                        label: '校对开始',
+                        title: '',
+                        value: a['Review_Start_Time'] ? a['Review_Start_Time'] : '',
+                    },
+                    {
+                        label: '校对完成',
+                        title: '',
+                        value: a['Review_End_Time'] ? a['Review_End_Time'] : '',
+                    },
+                    {
+                        label: '编辑',
+                        title: '',
+                        value: a['Audit_User_Name'] ? a['Audit_User_Name'] : '',
+                    },
+                    {
+                        label: '编辑开始',
+                        title: '',
+                        value: a['Audit_Start_Time'] ? a['Audit_Start_Time'] : '',
+                    },
+                    {
+                        label: '编辑完成',
+                        title: '',
+                        value: a['Audit_End_Time'] ? a['Audit_End_Time'] : '',
                     },
                 ]
             }
         },
         methods: {
             /**
-             * 处理点击开始翻译的按钮
+             * 处理点击开始编辑的按钮
              *
              * @param {object} article 当前文章
              */
-            startTranslate(article) {
+            start(article) {
                 let params = {
                     Article_Translate_ID: article.Article_Translate_ID,
-                    Translate_Status: 'TW',
+                    Translate_Status: 'AW',
                 }
-                this.$api.translation.status(params).then(resp => {
+                this.$api.audit.status(params).then(resp => {
                     let data = resp.data
                     if (data.error) {
                         this.$Message.error(data.error.message)
                     } else {
                         // 跳转到翻译界面
-                        this.$router.push(`/translation/translate/${params.Article_Translate_ID}`)
+                        this.$router.push(`/audit/audit/${params.Article_Translate_ID}`)
                     }
                 }).catch(err => {
 
@@ -305,7 +343,7 @@
 
                 this.loading = true
                 this.article = null
-                this.$api.translation.detail({id: this.$route.params.id}).then(resp => {
+                this.$api.audit.detail({id: this.$route.params.id}).then(resp => {
                     this.loading = false
                     this.article = resp.data
 

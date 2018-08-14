@@ -8,23 +8,14 @@
 
 import api from './api-client'
 
-const PREFIX = '/v1/translation/'
+const PREFIX = '/v1/audit/'
 
 export default {
-    list(params) {
-        return api.doRequest(PREFIX + 'list', api.GET, params)
-    },
-    count(params) {
-        return api.doRequest(PREFIX + 'count', api.GET, params)
-    },
     articles(params) {
         return api.doRequest(PREFIX + 'articles', api.GET, params)
     },
     detail(params) {
         return api.doRequest(PREFIX + 'detail', api.GET, params)
-    },
-    translate(data) {
-        return api.doRequest(PREFIX + 'translate', api.POST, null, data)
     },
     status(data) {
         return api.doRequest(PREFIX + 'status', api.PUT, null, data)

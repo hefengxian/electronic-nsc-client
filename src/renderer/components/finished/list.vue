@@ -60,7 +60,7 @@
                         </form-item>
                     </i-col>
                     <i-col :span="4">
-                        <form-item label="翻译人员">
+                        <form-item label="翻译/校对/编辑人员">
                             <i-select v-model="form.Translate_User_ID"
                                       clearable
                                       filterable

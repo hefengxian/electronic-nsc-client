@@ -4,10 +4,15 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem>
-                        <icon type="md-swap"></icon>
-                        翻译
+                    <BreadcrumbItem to="/audit">
+                        <icon type="md-create"></icon>
+                        待编库
                     </BreadcrumbItem>
+                    <BreadcrumbItem :to="`/audit/detail/${$route.params.id}`">
+                        <icon type="md-create"></icon>
+                        编辑译文
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>{{article ? article.Article_Title : ''}}</BreadcrumbItem>
                 </Breadcrumb>
             </div>
             <div class="nsc-body-right-nav-right"></div>
@@ -22,19 +27,19 @@
                     <i-button v-if="canSetFinish()"
                               title="将状态设置为完成，并保存当前未保存的内容"
                               @click="finish"
-                              icon="md-checkmark-circle">完成翻译</i-button>
-                    <i-button v-if="canSetCancel()"
-                              @click="cancel"
-                              title="取消翻译，文章重新变成待译状态"
-                              icon="ios-power">取消翻译</i-button>
+                              icon="md-checkmark-circle">完成编辑</i-button>
                 </button-group>
+
+                <div style="display: inline-block; margin-left: 16px; font-size: 12px;"> 评分：
+                    <Rate v-model="translateArticle.score" />
+                </div>
             </div>
             <p slot="extra">
                 <span>{{saveStatus}}</span>
                 <divider type="vertical"/>
-                <span>字数：{{numeral(countInfo.characters).format('0,0')}}</span>
+                <span>字数：{{numeral(characterCount).format('0,0')}}</span>
                 <divider type="vertical"/>
-                <span>正在翻译</span>
+                <span>正在编辑</span>
             </p>
 
             <div style="height: calc(100vh - 195px); margin: -16px;"
@@ -64,12 +69,12 @@
                                 :model="translateArticle"
                                 label-position="top">
                             <form-item label="标题">
-                                <i-input v-model.trim="translateArticle.Translate_Title"
+                                <i-input v-model.trim="translateArticle.title"
                                          placeholder="文章标题"></i-input>
                             </form-item>
 
                             <form-item label="正文" prop="article_content">
-                                <editor v-model.trim="translateArticle.Translate_Content"
+                                <editor v-model.trim="translateArticle.content"
                                         style="height: calc(100vh - 420px);"
                                         :options="editorOptions"></editor>
                             </form-item>
@@ -124,24 +129,35 @@
                 split: 0.5,
                 editorOptions,
                 translateArticle: {
-                    Translate_Title: '',
-                    Translate_Content: '',
+                    title: '',
+                    content: '',
+                    score: 0,
                 },
-                countInfo: {
+                contentCount: {
                     paragraphs: 0,
                     sentences: 0,
                     words: 0,
                     characters: 0,
                     all: 0
                 },
+                titleCount: {
+                    paragraphs: 0,
+                    sentences: 0,
+                    words: 0,
+                    characters: 0,
+                    all: 0
+                }
             }
         },
         watch: {
             translateArticle: {
                 handler(val, old) {
-                    Countable.count(val.Translate_Content, countInfo => {
-                        this.countInfo = countInfo
+                    Countable.count(val.content, countInfo => {
+                        this.contentCount = countInfo
                     }, {stripTags: true})
+                    Countable.count(val.title, countInfo => {
+                        this.titleCount = countInfo
+                    })
 
                     if (moment().diff(this.lastSaveTime, 'seconds') > 30) {
                         this.lastSaveTime = moment()
@@ -153,6 +169,11 @@
                 deep: true,
             },
         },
+        computed: {
+            characterCount() {
+                return this.titleCount.characters + this.contentCount.characters
+            }
+        },
         methods: {
             /**
              * 获取文章
@@ -162,10 +183,10 @@
 
                 this.loading = true
                 this.article = null
-                this.$api.translation.detail({id: this.$route.params.id}).then(resp => {
+                this.$api.audit.detail({id: this.$route.params.id}).then(resp => {
                     let data = resp.data
                     // 做个拦截，防止有人输入地址进入界面
-                    if (this.cu.User_ID != data.Translate_User_ID) {
+                    if (this.cu.User_ID != data.Audit_User_ID) {
                         // 跳转到首页
                         this.$router.push('/')
                         return
@@ -173,8 +194,9 @@
                     this.loading = false
                     this.article = data
                     this.translateArticle= {
-                        Translate_Title: data['Translate_Title'] ? data['Translate_Title'] : '',
-                        Translate_Content: data['Translate_Content'] ? data['Translate_Content'] : '',
+                        title: data['Audit_Title'] ? data['Audit_Title'] : '',
+                        content: data['Audit_Content'] ? data['Audit_Content'] : '',
+                        score: data['Translate_Score_By_Audit'] ? data['Translate_Score_By_Audit'] : 0,
                     }
                 })
             },
@@ -197,8 +219,9 @@
              * 保存到服务器
              */
             save() {
-                if (this.translateArticle['Translate_Title'] === this.article['Translate_Title'] &&
-                    this.translateArticle['Translate_Content'] === this.article['Translate_Content']) {
+                if (this.translateArticle['title'] === this.article['Audit_Title'] &&
+                    this.translateArticle['content'] === this.article['Audit_Content'] &&
+                    this.translateArticle.score === this.article['Translate_Score_By_Audit']) {
                     this.saveStatus = '已保存'
                     // 如果内容没有变动，无需保存
                     return
@@ -206,22 +229,24 @@
                 this.saveStatus = '保存中...'
                 let reqData = {
                     Article_Translate_ID: this.$route.params.id,
-                    Translate_Title: this.translateArticle['Translate_Title'],
-                    Translate_Content: this.translateArticle['Translate_Content']
+                    Audit_Title: this.translateArticle.title,
+                    Audit_Content: this.translateArticle.content.replace("<p><br></p>", ""),
+                    Score: this.translateArticle.score,
+                    Character_Count: this.characterCount,
                 }
-                this.$api.translation.save(reqData).then(resp => {
-                    this.saveStatus = '已保存'
+                this.$api.audit.save(reqData).then(resp => {
                     let data = resp.data
                     if (data.error) {
+                        this.saveStatus = '保存失败'
                         this.$Message.error(data.error.message)
                     } else {
+                        this.saveStatus = '已保存'
                         // 更新这两个字段
-                        this.article['Translate_Title'] = reqData.Translate_Title
-                        this.article['Translate_Content'] = reqData.Translate_Content
-                        this.article['Translate_Last_Update_Time'] = moment().format(DATE_FORMAT)
+                        this.article['Audit_Title'] = reqData.Audit_Title
+                        this.article['Audit_Content'] = reqData.Audit_Content
                     }
                 }).catch(err => {
-                    this.saveStatus = '未保存'
+                    this.saveStatus = '保存失败'
                 })
             },
 
@@ -232,19 +257,8 @@
              */
             canSetFinish(){
                 // 如果是完成或者完成之后的状态，不能再点完成
-                return ['TN', 'TW'].indexOf(this.article['Translate_Status']) > -1
+                return ['AW'].indexOf(this.article['Translate_Status']) > -1
             },
-
-
-            /**
-             * 判断是否可以设置为取消
-             *
-             * @return {boolean}
-             */
-            canSetCancel() {
-                return this.article['Translate_Status'] === 'TW'
-            },
-
 
             /**
              * 设置翻译完成
@@ -252,42 +266,21 @@
             finish() {
                 this.save()
                 if (!this.canSetFinish()) return
-                if (this.translateArticle['Translate_Title'].trim() === '' || this.translateArticle['Translate_Content'].trim() === '') {
+                if (this.translateArticle['title'].trim() === '' || this.translateArticle['content'].trim() === '') {
                     this.$Message.error('译文标题或者内容为空，不能设置为完成！')
                     return
                 }
                 let params = {
                     Article_Translate_ID: this.article.Article_Translate_ID,
-                    Translate_Status: 'TF',
+                    Translate_Status: 'AF',
                 }
-                this.$api.translation.status(params).then(resp => {
+                this.$api.audit.status(params).then(resp => {
                     let data = resp.data
                     if (data.error) {
                         this.$Message.error(data.error.message)
                     } else {
                         // 跳转到详情界面
-                        this.$router.push(`/translation/detail/${params.Article_Translate_ID}`)
-                    }
-                }).catch(err => {})
-            },
-
-            /**
-             * 设置取消翻译
-             */
-            cancel() {
-                this.save()
-                if (!this.canSetCancel()) return
-                let params = {
-                    Article_Translate_ID: this.article.Article_Translate_ID,
-                    Translate_Status: 'TN',
-                }
-                this.$api.translation.status(params).then(resp => {
-                    let data = resp.data
-                    if (data.error) {
-                        this.$Message.error(data.error.message)
-                    } else {
-                        // 跳转到列表界面
-                        this.$router.push(`/translation`)
+                        this.$router.push(`/audit/detail/${params.Article_Translate_ID}`)
                     }
                 }).catch(err => {})
             },
