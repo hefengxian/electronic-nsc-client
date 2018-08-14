@@ -3,9 +3,9 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem>
-                        <icon type="md-swap"></icon>
-                        待译库
+                    <BreadcrumbItem to="/finished">
+                        <icon type="md-filing"></icon>
+                        成稿库
                     </BreadcrumbItem>
                 </Breadcrumb>
             </div>
@@ -19,14 +19,17 @@
                     v-model="form">
                 <row :gutter="24">
                     <i-col :span="4">
-                        <form-item label="状态">
-                            <i-select v-model="form.Translate_Status"
-                                      clearable
-                                      @on-change="doQuery()">
-                                <i-option value="TN">待翻译</i-option>
-                                <i-option value="TW">翻译中</i-option>
-                                <i-option value="TF">已翻译</i-option>
-                            </i-select>
+                        <form-item label="入库时间">
+                            <DatePicker type="daterange"
+                                        :options="datepickerOptions"
+                                        v-model="form.Audit_End_Time"
+                                        :clearable="false"
+                                        @on-change="handleDatePickerChange"
+                                        format="yyyy/MM/dd"
+                                        placement="bottom-start"
+                                        split-panels
+                                        placeholder="选择日期范围"
+                                        style="width: 100%;"></DatePicker>
                         </form-item>
                     </i-col>
                     <i-col :span="4">
@@ -48,7 +51,7 @@
                     </i-col>
                     <i-col :span="4">
                         <form-item label="用户组">
-                            <i-select v-model="form.Translate_User_Group_ID"
+                            <i-select v-model="form.Group_ID"
                                       clearable
                                       @on-change="doQuery()">
                                 <i-option v-for="(group, key) in groups"
@@ -61,7 +64,7 @@
                     </i-col>
                     <i-col :span="4">
                         <form-item label="翻译/校对/编辑人员">
-                            <i-select v-model="form.Translate_User_ID"
+                            <i-select v-model="form.User_ID"
                                       clearable
                                       filterable
                                       placeholder="键入关键词过滤"
@@ -73,13 +76,13 @@
                                           :key="key"
                                           :label="user.User_Name"
                                           :value="user.User_ID">
-                                    </i-option>
+                                </i-option>
                             </i-select>
                         </form-item>
                     </i-col>
                     <i-col :span="8">
                         <form-item label="关键词">
-                            <i-input placeholder="关键词：标题、摘要、作者"
+                            <i-input placeholder="关键词：校对后标题、校对后正文中搜索"
                                      @on-search="doQuery()"
                                      v-model="form.keyword"
                                      clearable
@@ -95,6 +98,17 @@
               :bordered="false">
             <div class="nsc-list-header">
                 <div class="nsc-list-header-left">
+                    <Dropdown placement="bottom-start"
+                              trigger="click">
+                        <Button :disabled="selected.length < 1">
+                            批量...
+                            <Icon type="ios-arrow-down"></Icon>
+                        </Button>
+                        <DropdownMenu slot="list">
+                            <DropdownItem @click.native="handleExportAction('txt')">导出 TXT</DropdownItem>
+                            <!--<DropdownItem @click.native="handleExportAction('excel')">导出 Excel</DropdownItem>-->
+                        </DropdownMenu>
+                    </Dropdown>
                 </div>
                 <div class="nsc-list-header-right">
                 </div>
@@ -105,11 +119,15 @@
                     <table style="width: 100%; border: 0;" cellspacing="0" cellpadding="0">
                         <thead>
                         <tr>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 50px">
+                                <checkbox v-model="checkAll"
+                                          @on-change="handleCheckAllChange"></checkbox>
+                            </th>
                             <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">入库时间</th>
-                            <th class="ivu-table-cell ivu-table-column-center" style="width: 80px">时限</th>
-                            <th class="ivu-table-cell">标题/摘要</th>
+                            <th class="ivu-table-cell">译文标题</th>
                             <th class="ivu-table-cell" style="width: 150px">翻译员</th>
-                            <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">操作</th>
+                            <th class="ivu-table-cell" style="width: 150px">校对员</th>
+                            <th class="ivu-table-cell" style="width: 150px">编辑</th>
                         </tr>
                         </thead>
                         <tbody class="ivu-table-tbody">
@@ -119,23 +137,21 @@
                         <tr v-for="(article, key) in listRecords.list"
                             :key="key">
                             <td class="ivu-table-cell ivu-table-column-center">
-                                <!-- 入库时间 -->
-                                <span :style="getTimeoutStyle(article)">{{calcPassTime(article)}}</span>
-                                <br>
-                                <span>{{article['Selected_Time']}}</span>
+                                <checkbox v-model="article._checked"></checkbox>
                             </td>
 
-                            <!-- 时限 -->
-                            <td class="ivu-table-cell ivu-table-column-center">{{calcTime(article)}}</td>
+                            <td class="ivu-table-cell ivu-table-column-center">
+                                <!-- 入库时间 -->
+                                <span>{{calcPassTime(article)}}</span>
+                                <br>
+                                <span>{{article['Audit_End_Time']}}</span>
+                            </td>
 
                             <!-- 标题、摘要 -->
                             <td class="ivu-table-cell article-info">
-                                <router-link @click.native="handleDetailLinkClick(article)"
-                                             :to="`/translation/detail/${article.Article_Translate_ID}`">
+                                <router-link :to="`/finished/detail/${article.Article_Translate_ID}`">
                                     <p class="ivu-table-cell-ellipsis">
-                                        <b>{{article.Article_Title}}</b>
-                                        <span v-if="typeof article.Article_Abstract === 'string' && article.Article_Abstract.trim().length > 0"
-                                              class="text-muted">&nbsp;- &nbsp;{{article.Article_Abstract.trim()}}</span>
+                                        <b>{{article.Translate_Title}}</b>
                                     </p>
                                 </router-link>
                             </td>
@@ -143,30 +159,11 @@
                             <!-- 翻译员 -->
                             <td class="ivu-table-cell">{{article.Translate_User_Name}}</td>
 
-                            <!-- 操作 -->
-                            <td class="ivu-table-cell ivu-table-column-center">
-                                <div>
-                                    <i-button size="small"
-                                              v-if="article.Translate_Status == 'TN'"
-                                              title="开始翻译"
-                                              @click="startTranslate(article)"
-                                              icon="md-swap">开始翻译</i-button>
-                                    <i-button size="small"
-                                              v-if="article.Translate_Status == 'TW'"
-                                              title="正在翻译"
-                                              :disabled="cu.User_ID != article.Translate_User_ID"
-                                              type="info"
-                                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                                              icon="md-lock">正在翻译</i-button>
-                                    <i-button size="small"
-                                              v-if="['TF','AW','AF','RW','RF'].indexOf(article.Translate_Status) > -1"
-                                              title="翻译完成"
-                                              @click="$router.push(`/translation/translate/${article['Article_Translate_ID']}`)"
-                                              :disabled="cu.User_ID != article.Translate_User_ID || article.Translate_Status != 'TF'"
-                                              type="success"
-                                              icon="md-checkmark"> 翻译完成</i-button>
-                                </div>
-                            </td>
+                            <!-- 校对员 -->
+                            <td class="ivu-table-cell">{{article.Review_User_Name}}</td>
+
+                            <!-- 编辑 -->
+                            <td class="ivu-table-cell">{{article.Audit_User_Name}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -196,6 +193,7 @@
 
 <script>
     import moment from 'moment'
+    import Qs from 'query-string'
 
     const DATE_FORMAT = 'YYYY/MM/DD'
     moment.locale('zh-cn')
@@ -209,13 +207,54 @@
                 checkAll: false,
                 moment,
                 form: {
-                    Translate_Status: '',
+                    Audit_End_Time: [new Date(), new Date()],
                     Raw_Language_Code: '',
-                    Translate_User_ID: '',
-                    Translate_User_Group_ID: '',
+                    User_ID: '',
+                    Group_ID: '',
                     keyword: '',
                     page_no: 1,
                     page_size: 10,
+                },
+                datepickerOptions: {
+                    shortcuts: [
+                        {
+                            text: '今天',
+                            value () {
+                                const end = new Date()
+                                const start = new Date()
+                                start.setTime(start.getTime())
+                                return [start, end]
+                            }
+                        },
+                        {
+                            text: '昨天',
+                            value () {
+                                const end = new Date()
+                                const start = new Date()
+                                start.setTime(start.getTime() - 3600 * 1000 * 24)
+                                end.setTime(start.getTime())
+                                return [start, end];
+                            }
+                        },
+                        {
+                            text: '最近 7 天',
+                            value () {
+                                const end = new Date()
+                                const start = new Date()
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 6)
+                                return [start, end]
+                            }
+                        },
+                        {
+                            text: '最近 30 天',
+                            value () {
+                                const end = new Date()
+                                const start = new Date()
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                                return [start, end]
+                            }
+                        },
+                    ]
                 },
                 languages: [],
                 // User Loading
@@ -229,8 +268,20 @@
             }
         },
         computed: {
+            selected () {
+                return this.listRecords.list.filter(v => v._checked)
+            }
         },
-        mounted () {
+        created () {
+            Promise.all([
+                this.$api.system.languages(),
+                this.$api.system.groups(),
+                this.$api.system.users(),
+            ]).then(resp => {
+                this.languages = resp[0].data.list
+                this.groups = resp[1].data
+                this.users = resp[2].data.list
+            })
         },
         methods: {
             /**
@@ -244,10 +295,22 @@
                 }
 
                 let params = {...this.form}
+                // 处理时间
+                if (params.Audit_End_Time.length === 2) {
+                    params.Audit_End_Time = params.Audit_End_Time.map(v => {
+                        return (v instanceof Date) ? moment(v).format(DATE_FORMAT) : v
+                    }).join('-')
+                }
+
                 this.loading = true
-                this.$api.translation.articles(params).then(resp => {
+                this.$api.finished.articles(params).then(resp => {
                     this.loading = false
-                    this.listRecords = resp.data
+                    let data = resp.data
+                    data.list = data.list.map(v => {
+                        v._checked = false
+                        return v
+                    })
+                    this.listRecords = data
                 })
             },
 
@@ -274,11 +337,27 @@
 
 
             /**
-             * 处理点击详情链接
+             * 处理日期控件的变化事件
              *
-             * @param {object} article 当前点击的文章
+             * @param {array|string} date 改变的日期
+             * @param {string} type 类型
              */
-            handleDetailLinkClick (article) {
+            handleDatePickerChange (date, type) {
+                this.form.Audit_End_Time = date
+                this.doQuery(true)
+            },
+
+
+            /**
+             * 处理表头的全选 Checkbox 变化事件
+             *
+             * @param {boolean} status 当前的状态
+             */
+            handleCheckAllChange (status) {
+                this.listRecords.list = this.listRecords.list.map(v => {
+                    v._checked = status
+                    return v
+                })
             },
 
 
@@ -289,71 +368,15 @@
              * @returns {string}
              */
             calcPassTime (article) {
-                return moment(article['Selected_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
+                return moment(article['Audit_End_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
             },
 
             /**
-             * 给定秒数，计算多少天，多少小时，多少分钟
+             * 获取用户列表，Select 控件使用
              *
-             * @param {object} article 秒数
-             * @returns {string}
+             * @param keyword
              */
-            calcTime (article) {
-                let seconds = article['Translate_Plan_End_Time']
-                let duration = moment.duration(Number(seconds), 'seconds')
-                let result = ''
-                if (duration.days() > 0) {
-                    result += `${duration.days()}天`
-                }
-                if (duration.hours() > 0) {
-                    result += `${duration.hours()}小时`
-                }
-                if (duration.minutes() > 0) {
-                    result += `${duration.minutes()}分钟`
-                }
-                return result
-            },
-
-            /**
-             * 获取是否超时的颜色
-             *
-             * @param {object} article
-             * @returns {{color: string}}
-             */
-            getTimeoutStyle (article) {
-                let selectTime = moment(article['Selected_Time'], 'YYYY-MM-DD HH:mm:ss')
-                let durationSeconds = moment().diff(selectTime, 'seconds')
-                let isTimeout = article['Translate_Plan_End_Time'] < durationSeconds
-                return {
-                    color: isTimeout ? '#ed4014' : '#19be6b',
-                }
-            },
-
-            /**
-             * 处理点击开始翻译的按钮
-             *
-             * @param {object} article 当前文章
-             */
-            startTranslate(article) {
-                let params = {
-                    Article_Translate_ID: article.Article_Translate_ID,
-                    Translate_Status: 'TW',
-                }
-                this.$api.translation.status(params).then(resp => {
-                    let data = resp.data
-                    if (data.error) {
-                        this.$Message.error(data.error.message)
-                    } else {
-                        // 跳转到翻译界面
-                        this.$router.push(`/translation/translate/${params.Article_Translate_ID}`)
-                    }
-                }).catch(err => {
-
-                })
-            },
-
-
-            getUserList(keyword) {
+            getUserList (keyword) {
                 this.userListLoading = true
                 this.$api.system.users({keyword}).then(resp => {
                     this.userListLoading = false
@@ -361,21 +384,16 @@
                 })
             },
 
+            handleExportAction (type) {
+                let ids = this.selected.map(v => v.Article_Translate_ID)
+                let params = {ids: ids.join(','),type}
+                let url = `${window.BASE_URL}/public/export?${Qs.stringify(params)}`
+                location.href = url
+            }
         },
-        components: {
-            layout: require('../common/layout').default
-        },
+        components: {},
         beforeRouteEnter (to, from, next) {
             next(vm => {
-                Promise.all([
-                    vm.$api.system.languages(),
-                    vm.$api.system.groups(),
-                    vm.$api.system.users(),
-                ]).then(resp => {
-                    vm.languages = resp[0].data.list
-                    vm.groups = resp[1].data
-                    vm.users = resp[2].data.list
-                })
                 vm.doQuery(false)
             })
         },

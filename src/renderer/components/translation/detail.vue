@@ -286,9 +286,34 @@
                         value: a['Translate_End_Time'] ? a['Translate_End_Time'] : '',
                     },
                     {
-                        label: '最后更新',
+                        label: '校对',
                         title: '',
-                        value: a['Translate_Last_Update_Time'] ? a['Translate_Last_Update_Time'] : '',
+                        value: a['Review_User_Name'] ? a['Review_User_Name'] : '',
+                    },
+                    {
+                        label: '校对开始',
+                        title: '',
+                        value: a['Review_Start_Time'] ? a['Review_Start_Time'] : '',
+                    },
+                    {
+                        label: '校对完成',
+                        title: '',
+                        value: a['Review_End_Time'] ? a['Review_End_Time'] : '',
+                    },
+                    {
+                        label: '编辑',
+                        title: '',
+                        value: a['Audit_User_Name'] ? a['Audit_User_Name'] : '',
+                    },
+                    {
+                        label: '编辑开始',
+                        title: '',
+                        value: a['Audit_Start_Time'] ? a['Audit_Start_Time'] : '',
+                    },
+                    {
+                        label: '编辑完成',
+                        title: '',
+                        value: a['Audit_End_Time'] ? a['Audit_End_Time'] : '',
                     },
                 ]
             }
