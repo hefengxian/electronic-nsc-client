@@ -26,4 +26,10 @@ export default {
     currentGroupUser() {
         return api.doRequest(PREFIX + 'current-group-user', api.GET)
     },
+    users(params) {
+        return api.doRequest(PREFIX + 'users', api.GET, params)
+    },
+    groups() {
+        return api.doRequest(PREFIX + 'groups', api.GET)
+    },
 }

@@ -173,8 +173,8 @@
                     this.loading = false
                     this.article = data
                     this.translateArticle= {
-                        Translate_Title: data['Translate_Title'],
-                        Translate_Content: data['Translate_Content'],
+                        Translate_Title: data['Translate_Title'] ? data['Translate_Title'] : '',
+                        Translate_Content: data['Translate_Content'] ? data['Translate_Content'] : '',
                     }
                 })
             },
@@ -252,7 +252,7 @@
             finish() {
                 this.save()
                 if (!this.canSetFinish()) return
-                if (this.translateArticle['Translate_Title'] === '' || this.translateArticle['Translate_Content'] === '') {
+                if (this.translateArticle['Translate_Title'].trim() === '' || this.translateArticle['Translate_Content'].trim() === '') {
                     this.$Message.error('译文标题或者内容为空，不能设置为完成！')
                     return
                 }

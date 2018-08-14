@@ -51,7 +51,11 @@
                             <i-select v-model="form.Translate_User_Group_ID"
                                       clearable
                                       @on-change="doQuery()">
-                                <i-option value="">&nbsp;</i-option>
+                                <i-option v-for="(group, key) in groups"
+                                          :key="key"
+                                          :label="group.Work_Group_Name"
+                                          :value="group.Work_Group_ID">
+                                </i-option>
                             </i-select>
                         </form-item>
                     </i-col>
@@ -59,8 +63,17 @@
                         <form-item label="翻译人员">
                             <i-select v-model="form.Translate_User_ID"
                                       clearable
+                                      filterable
+                                      placeholder="键入关键词过滤"
+                                      remote
+                                      :loading="userListLoading"
+                                      :remote-method="getUserList"
                                       @on-change="doQuery()">
-                                <i-option value="">&nbsp;</i-option>
+                                <i-option v-for="(user, key) in users"
+                                          :key="key"
+                                          :label="user.User_Name"
+                                          :value="user.User_ID">
+                                    </i-option>
                             </i-select>
                         </form-item>
                     </i-col>
@@ -196,7 +209,7 @@
                 checkAll: false,
                 moment,
                 form: {
-                    Translate_Status: 'TN',
+                    Translate_Status: '',
                     Raw_Language_Code: '',
                     Translate_User_ID: '',
                     Translate_User_Group_ID: '',
@@ -205,6 +218,8 @@
                     page_size: 10,
                 },
                 languages: [],
+                // User Loading
+                userListLoading: false,
                 users: [],
                 groups: [],
                 listRecords: {
@@ -335,7 +350,16 @@
                 }).catch(err => {
 
                 })
-            }
+            },
+
+
+            getUserList(keyword) {
+                this.userListLoading = true
+                this.$api.system.users({keyword}).then(resp => {
+                    this.userListLoading = false
+                    this.users = resp.data.list
+                })
+            },
 
         },
         components: {
@@ -343,8 +367,14 @@
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {
-                vm.$api.system.languages().then(resp => {
-                    vm.languages = resp.data.list
+                Promise.all([
+                    vm.$api.system.languages(),
+                    vm.$api.system.groups(),
+                    vm.$api.system.users(),
+                ]).then(resp => {
+                    vm.languages = resp[0].data.list
+                    vm.groups = resp[1].data
+                    vm.users = resp[2].data.list
                 })
                 vm.doQuery(false)
             })
