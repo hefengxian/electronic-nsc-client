@@ -29,4 +29,7 @@ export default {
     status(data) {
         return api.doRequest(PREFIX + 'status', api.PUT, null, data)
     },
+    save(data) {
+        return api.doRequest(PREFIX + 'save', api.PUT, null, data)
+    },
 }
