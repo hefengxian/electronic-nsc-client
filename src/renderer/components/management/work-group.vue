@@ -6,34 +6,8 @@
                     v-model="form">
                 <row :gutter="24">
                     <i-col :span="6">
-                        <form-item label="用户组">
-                            <i-select v-model="form.Group_ID"
-                                      clearable
-                                      @on-change="doQuery()">
-                                <i-option v-for="(group, key) in groups"
-                                          :key="key"
-                                          :label="group.Work_Group_Name"
-                                          :value="group.Work_Group_ID">
-                                </i-option>
-                            </i-select>
-                        </form-item>
-                    </i-col>
-                    <i-col :span="6">
-                        <form-item label="角色">
-                            <i-select v-model="form.Role_ID"
-                                      clearable
-                                      @on-change="doQuery()">
-                                <i-option v-for="(role, key) in roles"
-                                          :key="key"
-                                          :label="role.Role_Name"
-                                          :value="role.Role_ID">
-                                </i-option>
-                            </i-select>
-                        </form-item>
-                    </i-col>
-                    <i-col :span="6">
                         <form-item label="关键词">
-                            <i-input placeholder="关键词：标题、摘要、作者"
+                            <i-input placeholder="关键词"
                                      @on-search="doQuery()"
                                      v-model="form.keyword"
                                      clearable
@@ -46,24 +20,34 @@
 
         <!-- 内容 -->
         <card dis-hover :bordered="false" class="margin-top-16 nsc-list">
+            <!-- 顶部工具栏 -->
             <div class="nsc-list-header">
                 <div class="nsc-list-header-left">
                     <button-group>
-                        <i-button icon="md-person-add">添加</i-button>
-                        <i-button icon="md-create">编辑</i-button>
-                        <i-button icon="md-trash">删除</i-button>
+                        <i-button icon="md-person-add"
+                                  @click="createModal.show = true">添加</i-button>
+                        <i-button icon="md-create"
+                                  @click="handleEditButtonClick"
+                                  :disabled="!selected">编辑</i-button>
+                        <i-button icon="md-trash"
+                                  @click="handleDeleteButtonClick"
+                                  :disabled="!selected">删除</i-button>
                     </button-group>
                 </div>
-                <div class="nsc-list-header-right">
-                </div>
+                <div class="nsc-list-header-right"></div>
             </div>
 
+            <!-- 列表 -->
             <div class="nsc-list-body margin-top-8 margin-bottom-8">
-                <i-table :loading="loading"
+                <i-table ref="list"
+                         :loading="loading"
+                         highlight-row
+                         @on-row-click="handleROwClick"
                          :data="listRecords.list"
                          :columns="columns"></i-table>
             </div>
 
+            <!-- 底部工具栏 -->
             <div class="nsc-list-footer">
                 <div class="nsc-list-footer-left"></div>
                 <div class="nsc-list-footer-right">
@@ -81,9 +65,56 @@
                 </div>
             </div>
         </card>
+
+        <!-- 创建工作组 -->
+        <modal v-model="createModal.show"
+               :mask-closable="false"
+               @on-visible-change="handleCreateModalVisibleChange"
+               title="添加新工作组">
+            <Form ref="create-form"
+                  :rules="createModal.rules"
+                  :label-width="80"
+                  style="padding-right: 40px;"
+                  :model="createModal.form">
+                <form-item label="名称" prop="Work_Group_Name">
+                    <i-input v-model.trim="createModal.form.Work_Group_Name"
+                             placeholder="名称"/>
+                </form-item>
+            </Form>
+
+            <div slot="footer">
+                <i-button type="text" @click="createModal.show = false">取消</i-button>
+                <i-button type="primary" @click="handleCreateModalClickOk">确定</i-button>
+            </div>
+        </modal>
+
+
+        <!-- 编辑工作组 -->
+        <modal v-model="editModal.show"
+               :mask-closable="false"
+               @on-visible-change="handleCreateModalVisibleChange"
+               title="编辑工作组">
+            <Form ref="edit-form"
+                  :rules="editModal.rules"
+                  :label-width="80"
+                  style="padding-right: 40px;"
+                  :model="editModal.form">
+                <form-item label="名称" prop="Work_Group_Name">
+                    <i-input v-model.trim="editModal.form.Work_Group_Name"
+                             placeholder="名称"/>
+                </form-item>
+            </Form>
+
+            <div slot="footer">
+                <i-button type="text" @click="editModal.show = false">取消</i-button>
+                <i-button type="primary" @click="handleEditModalClickOk">确定</i-button>
+            </div>
+        </modal>
     </div>
 </template>
 <style>
+
+
 </style>
 <script>
     export default {
@@ -91,65 +122,64 @@
             return {
                 pageSizeOptions: [10, 20, 50, 100],
                 form: {
-                    Group_ID: '',
-                    Role_ID: '',
                     keyword: '',
                     page_no: 1,
                     page_size: 10,
                 },
-                groups: [],
-                roles: [],
                 listRecords: {
                     list: [],
                     total: 0
                 },
+                selected: null,
                 loading: false,
                 columns: [
                     {
                         title: 'ID',
-                        key: 'User_ID',
-                    },
-                    {
-                        title: '帐号',
-                        key: 'User_Account',
+                        key: 'Work_Group_ID',
                     },
                     {
                         title: '名称',
-                        key: 'User_Name',
-                    },
-                    {
-                        title: '最后登陆时间',
-                        key: 'Last_Login_Time',
+                        key: 'Work_Group_Name',
                     },
                     {
                         title: '创建时间',
                         key: 'Created_Time',
                     },
-                    {
-                        title: '工作组',
-                        key: 'Group',
-                        render(h, {row}) {
-                            return h('span', row['Groups'].map(v => v['Work_Group_Name']).join(','))
-                        },
-                    },
-                    {
-                        title: '角色',
-                        key: 'Roles',
-                        render(h, {row}) {
-                            return h('span', row['Roles'].map(v => v['Role_Name']).join(','))
-                        },
-                    },
                 ],
+
+                createModal: {
+                    show: false,
+                    form: {
+                        Work_Group_Name: '',
+                    },
+                    rules: {
+                        Work_Group_Name: [
+                            {
+                                required: true,
+                                message: "名称不能为空",
+                                trigger: "blur",
+                            },
+                        ],
+                    },
+                },
+                editModal: {
+                    show: false,
+                    form: {
+                        Work_Group_Name: '',
+                    },
+                    rules: {
+                        Work_Group_Name: [
+                            {
+                                required: true,
+                                message: "名称不能为空",
+                                trigger: "blur",
+                            },
+                        ],
+                    },
+                },
             }
         },
         created() {
-            Promise.all([
-                this.$api.system.groups(),
-                this.$api.system.roles(),
-            ]).then(resp => {
-                this.groups = resp[0].data
-                this.roles = resp[1].data.list
-            })
         },
         methods: {
             /**
@@ -157,14 +187,15 @@
              *
              * @param {boolean} reset 是否重置分页
              */
-            doQuery (reset = true) {
+            doQuery(reset = true) {
+                this.selected = null
                 if (reset) {
                     this.form.page_no = 1
                 }
 
                 let params = {...this.form}
                 this.loading = true
-                this.$api.management.user.list(params).then(resp => {
+                this.$api.management.workGroup.list(params).then(resp => {
                     this.loading = false
                     this.listRecords = resp.data
                 })
@@ -175,7 +206,7 @@
              *
              * @param {int} size 分页大小
              */
-            doPageSizeChange (size) {
+            doPageSizeChange(size) {
                 this.form.page_size = size
                 this.doQuery(false)
             },
@@ -185,10 +216,105 @@
              *
              * @param {int} current 当前页码
              */
-            doPageChange (current) {
+            doPageChange(current) {
                 this.form.page_no = current
                 this.doQuery(false)
             },
+
+            /**
+             * 表格单击某行的处理事件
+             *
+             * @param {object} row 当前行的数据
+             * @param index 当前行的索引
+             */
+            handleROwClick(row, index) {
+                this.selected = row
+            },
+
+            /**
+             * 处理添加
+             */
+            handleCreateModalClickOk() {
+                // 校验表单
+                this.$refs['create-form'].validate(valid => {
+                    if (valid) {
+                        // 提交创建
+                        let params = {...this.createModal.form}
+                        this.$api.management.workGroup.create(params).then(resp => {
+                            let data = resp.data
+                            if (data.result === 0) {
+                                this.$Message.error('创建失败')
+                            } else {
+                                // 刷新列表
+                                this.doQuery()
+                                this.createModal.show = false
+                            }
+                        })
+                    } else {
+                        // 显示错误不做任何操作
+                    }
+                })
+            },
+
+            /**
+             * 当创建工作组 Modal 开启或者关闭时的回调
+             *
+             * @param {boolean} visible
+             */
+            handleCreateModalVisibleChange(visible) {
+                // 关闭的时候把表单清空
+                if (!visible) {
+                    this.$refs['create-form'].resetFields()
+                }
+            },
+
+            /**
+             * 删除工作组
+             */
+            handleDeleteButtonClick() {
+                this.$Modal.confirm({
+                    title: '删除工作组',
+                    content: '你确定要删除这个工作组',
+                    onOk: () => {
+                        this.$api.management.workGroup.delete({Work_Group_ID: this.selected['Work_Group_ID']}).then(resp => {
+                            this.doQuery(false)
+                        })
+                    }
+                })
+            },
+
+            /**
+             * 更新按钮，
+             */
+            handleEditButtonClick() {
+                // 表单初始化
+                this.editModal.form.Work_Group_ID = this.selected.Work_Group_ID
+                this.editModal.form.Work_Group_Name = this.selected.Work_Group_Name
+                // 显示 Modal
+                this.editModal.show = true
+            },
+
+            handleEditModalClickOk() {
+                // 校验表单
+                this.$refs['edit-form'].validate(valid => {
+                    if (valid) {
+                        // 提交创建
+                        let params = {...this.editModal.form}
+                        this.$api.management.workGroup.edit(params).then(resp => {
+                            let data = resp.data
+                            if (data.result === 0) {
+                                this.$Message.error('更新失败')
+                            } else {
+                                // 刷新列表
+                                this.doQuery()
+                                this.editModal.show = false
+                            }
+                        })
+                    } else {
+                        // 显示错误不做任何操作
+                    }
+                })
+            }
         },
         components: {},
         beforeRouteEnter(to, from, next) {

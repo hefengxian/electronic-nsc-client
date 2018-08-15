@@ -27,6 +27,19 @@ export default {
         checkAccount(params) {
             return api.doRequest(PREFIX + 'user/check-account', api.GET, params)
         },
-    }
-
+    },
+    workGroup: {
+        list(params) {
+            return api.doRequest(PREFIX + 'work-group/list', api.GET, params)
+        },
+        create(data) {
+            return api.doRequest(PREFIX + 'work-group/create', api.POST, {}, data)
+        },
+        edit(data) {
+            return api.doRequest(PREFIX + 'work-group/edit', api.PUT, {}, data)
+        },
+        delete(params) {
+            return api.doRequest(PREFIX + 'work-group/delete', api.DELETE, params)
+        },
+    },
 }
