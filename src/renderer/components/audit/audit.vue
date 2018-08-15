@@ -230,7 +230,7 @@
                 let reqData = {
                     Article_Translate_ID: this.$route.params.id,
                     Audit_Title: this.translateArticle.title,
-                    Audit_Content: this.translateArticle.content.replace("<p><br></p>", ""),
+                    Audit_Content: this.translateArticle.content.replace(/<p><br><\/p>/g, ""),
                     Score: this.translateArticle.score,
                     Character_Count: this.characterCount,
                 }

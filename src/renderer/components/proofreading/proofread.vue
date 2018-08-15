@@ -28,6 +28,8 @@
                               title="将状态设置为完成，并保存当前未保存的内容"
                               @click="finish"
                               icon="md-checkmark-circle">完成校对</i-button>
+                    <i-button @click="finishEdit"
+                              icon="md-checkmark">完成修改</i-button>
                 </button-group>
 
                 <div style="display: inline-block; margin-left: 16px; font-size: 12px;"> 评分：
@@ -217,8 +219,10 @@
 
             /**
              * 保存到服务器
+             *
+             * @param {function} callback 保存完成之后的回调
              */
-            save() {
+            save(callback = null) {
                 if (this.translateArticle['title'] === this.article['Review_Title'] &&
                     this.translateArticle['content'] === this.article['Review_Content'] &&
                     this.translateArticle.score === this.article['Translate_Score_By_Review']) {
@@ -244,6 +248,9 @@
                         // 更新这两个字段
                         this.article['Review_Title'] = reqData.Review_Title
                         this.article['Review_Content'] = reqData.Review_Content
+                        if (callback instanceof Function) {
+                            callback()
+                        }
                     }
                 }).catch(err => {
                     this.saveStatus = '保存失败'
@@ -284,6 +291,19 @@
                     }
                 }).catch(err => {})
             },
+
+            /**
+             * 用来在修改校对之后点完成
+             */
+            finishEdit() {
+                if (this.saveStatus === '已保存') {
+                    this.$router.push(`/proofreading/detail/${this.$route.params.id}`)
+                    return
+                }
+                this.save(() => {
+                    this.$router.push(`/proofreading/detail/${this.$route.params.id}`)
+                })
+            }
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {

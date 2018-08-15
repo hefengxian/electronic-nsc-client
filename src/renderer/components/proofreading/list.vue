@@ -119,7 +119,7 @@
                                 <!-- 入库时间 -->
                                 <span>{{calcPassTime(article)}}</span>
                                 <br>
-                                <span>{{article['Translate_End_Time']}}</span>
+                                <span>{{article['Review_End_Time']}}</span>
                             </td>
 
                             <!-- 标题、摘要 -->

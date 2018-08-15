@@ -120,7 +120,7 @@
                                 <!-- 入库时间 -->
                                 <span>{{calcPassTime(article)}}</span>
                                 <br>
-                                <span>{{article['Translate_End_Time']}}</span>
+                                <span>{{article['Review_End_Time']}}</span>
                             </td>
 
                             <!-- 标题、摘要 -->
@@ -128,7 +128,7 @@
                                 <router-link @click.native="handleDetailLinkClick(article)"
                                              :to="`/audit/detail/${article.Article_Translate_ID}`">
                                     <p class="ivu-table-cell-ellipsis">
-                                        <b>{{article.Translate_Title}}</b>
+                                        <b>{{article.Review_Title}}</b>
                                     </p>
                                 </router-link>
                             </td>
@@ -299,7 +299,7 @@
              * @returns {string}
              */
             calcPassTime(article) {
-                return moment(article['Translate_End_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
+                return moment(article['Review_End_Time'], 'YYYY-MM-DD HH:mm:ss').fromNow()
             },
 
 

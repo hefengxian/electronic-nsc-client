@@ -132,7 +132,7 @@
                         </thead>
                         <tbody class="ivu-table-tbody">
                         <tr v-if="listRecords.list.length === 0">
-                            <td class="ivu-table-column-center" colspan="5">当前条件下没有数据</td>
+                            <td class="ivu-table-column-center" colspan="6">当前条件下没有数据</td>
                         </tr>
                         <tr v-for="(article, key) in listRecords.list"
                             :key="key">
@@ -151,7 +151,7 @@
                             <td class="ivu-table-cell article-info">
                                 <router-link :to="`/finished/detail/${article.Article_Translate_ID}`">
                                     <p class="ivu-table-cell-ellipsis">
-                                        <b>{{article.Translate_Title}}</b>
+                                        <b>{{article.Audit_Title}}</b>
                                     </p>
                                 </router-link>
                             </td>
