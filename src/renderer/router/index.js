@@ -116,6 +116,30 @@ export default new Router({
                 },
             ],
         },
+
+        // 管理
+        {
+            path: '/management',
+            component: () => import('../components/management/route'),
+            children: [
+                {
+                    path: '/',
+                    component: () => import('../components/management/user'),
+                },
+                {
+                    path: 'work-group',
+                    component: () => import('../components/management/work-group'),
+                },
+                {
+                    path: 'role',
+                    component: () => import('../components/management/role'),
+                },
+                {
+                    path: 'statistics',
+                    component: () => import('../components/management/statistics'),
+                },
+            ],
+        },
         { path: '*', redirect: '/' },
     ]
 })

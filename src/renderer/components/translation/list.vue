@@ -230,7 +230,16 @@
         },
         computed: {
         },
-        mounted () {
+        created () {
+            Promise.all([
+                this.$api.system.languages(),
+                this.$api.system.groups(),
+                this.$api.system.users(),
+            ]).then(resp => {
+                this.languages = resp[0].data.list
+                this.groups = resp[1].data
+                this.users = resp[2].data.list
+            })
         },
         methods: {
             /**
@@ -367,15 +376,6 @@
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {
-                Promise.all([
-                    vm.$api.system.languages(),
-                    vm.$api.system.groups(),
-                    vm.$api.system.users(),
-                ]).then(resp => {
-                    vm.languages = resp[0].data.list
-                    vm.groups = resp[1].data
-                    vm.users = resp[2].data.list
-                })
                 vm.doQuery(false)
             })
         },

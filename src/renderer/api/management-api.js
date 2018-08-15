@@ -8,28 +8,25 @@
 
 import api from './api-client'
 
-const PREFIX = '/v1/translation/'
+const PREFIX = '/v1/management/'
 
 export default {
-    list(params) {
-        return api.doRequest(PREFIX + 'list', api.GET, params)
-    },
-    count(params) {
-        return api.doRequest(PREFIX + 'count', api.GET, params)
-    },
-    articles(params) {
-        return api.doRequest(PREFIX + 'articles', api.GET, params)
-    },
-    detail(params) {
-        return api.doRequest(PREFIX + 'detail', api.GET, params)
-    },
-    translate(data) {
-        return api.doRequest(PREFIX + 'translate', api.POST, null, data)
-    },
-    status(data) {
-        return api.doRequest(PREFIX + 'status', api.PUT, null, data)
-    },
-    save(data) {
-        return api.doRequest(PREFIX + 'save', api.PUT, null, data)
-    },
+    user: {
+        list(params) {
+            return api.doRequest(PREFIX + 'user/list', api.GET, params)
+        },
+        create(data) {
+            return api.doRequest(PREFIX + 'user/create', api.POST, {}, data)
+        },
+        edit(data) {
+            return api.doRequest(PREFIX + 'user/edit', api.PUT, {}, data)
+        },
+        delete(params) {
+            return api.doRequest(PREFIX + 'user/delete', api.DELETE, params)
+        },
+        checkAccount(params) {
+            return api.doRequest(PREFIX + 'user/check-account', api.GET, params)
+        },
+    }
+
 }

@@ -32,4 +32,7 @@ export default {
     groups() {
         return api.doRequest(PREFIX + 'groups', api.GET)
     },
+    roles() {
+        return api.doRequest(PREFIX + 'roles', api.GET)
+    },
 }
