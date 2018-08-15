@@ -64,6 +64,12 @@
                         link: '/management/role',
                         desc: '管理角色',
                     },
+                    parameter: {
+                        label: '系统参数',
+                        icon: 'md-pricetag',
+                        link: '/management/parameter',
+                        desc: '管理角色',
+                    },
                     statistics: {
                         label: '工作统计',
                         icon: 'md-podium',

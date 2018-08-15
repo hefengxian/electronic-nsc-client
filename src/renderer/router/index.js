@@ -135,6 +135,10 @@ export default new Router({
                     component: () => import('../components/management/role'),
                 },
                 {
+                    path: 'parameter',
+                    component: () => import('../components/management/parameter'),
+                },
+                {
                     path: 'statistics',
                     component: () => import('../components/management/statistics'),
                 },
