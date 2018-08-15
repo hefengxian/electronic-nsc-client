@@ -17,11 +17,12 @@
         <card dis-hover :bordered="false">
             <Tabs type="card"
                   :animated="false"
+                  v-model="routePath"
                   @on-click="handleTabClick">
                 <TabPane v-for="(tab, key) in tabs"
                          :key="key"
                          :icon="tab.icon"
-                         :name="key"
+                         :name="tab.link"
                          :label="tab.label"></TabPane>
             </Tabs>
 
@@ -45,6 +46,7 @@
             return {
                 numeral,
                 cu: this.$localStore.getItem(this.$localStore.Keys.USER_KEY),   // 当前登录用户
+                routePath: this.$route.path,
                 tabs: {
                     user: {
                         label: '用户',
@@ -58,17 +60,23 @@
                         link: '/management/work-group',
                         desc: '管理工作组',
                     },
-                    role: {
+                    /*role: {
                         label: '角色',
                         icon: 'md-pricetag',
                         link: '/management/role',
                         desc: '管理角色',
-                    },
+                    },*/
                     parameter: {
                         label: '系统参数',
-                        icon: 'md-pricetag',
+                        icon: 'ios-construct',
                         link: '/management/parameter',
-                        desc: '管理角色',
+                        desc: '系统参数',
+                    },
+                    language: {
+                        label: '语种',
+                        icon: 'md-globe',
+                        link: '/management/language',
+                        desc: '原文语种',
                     },
                     statistics: {
                         label: '工作统计',
@@ -79,9 +87,11 @@
                 },
             }
         },
+        created() {
+        },
         methods: {
-            handleTabClick(tab) {
-                this.$router.push(this.tabs[tab].link)
+            handleTabClick(link) {
+                this.$router.push(link)
             }
         },
         components: {

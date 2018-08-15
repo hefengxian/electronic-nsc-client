@@ -6,6 +6,20 @@
                     v-model="form">
                 <row :gutter="24">
                     <i-col :span="6">
+                        <form-item label="操作时间">
+                            <DatePicker type="daterange"
+                                        :options="datePickerOptions"
+                                        v-model="form.Stat_Date"
+                                        :clearable="false"
+                                        @on-change="handleDatePickerChange"
+                                        format="yyyy/MM/dd"
+                                        placement="bottom-start"
+                                        split-panels
+                                        placeholder="选择日期范围"
+                                        style="width: 100%;"></DatePicker>
+                        </form-item>
+                    </i-col>
+                    <i-col :span="6">
                         <form-item label="用户组">
                             <i-select v-model="form.Group_ID"
                                       clearable
@@ -18,52 +32,17 @@
                             </i-select>
                         </form-item>
                     </i-col>
-                    <i-col :span="6">
-                        <form-item label="角色">
-                            <i-select v-model="form.Role_ID"
-                                      clearable
-                                      @on-change="doQuery()">
-                                <i-option v-for="(role, key) in roles"
-                                          :key="key"
-                                          :label="role.Role_Name"
-                                          :value="role.Role_ID">
-                                </i-option>
-                            </i-select>
-                        </form-item>
-                    </i-col>
-                    <i-col :span="6">
-                        <form-item label="关键词">
-                            <i-input placeholder="关键词：标题、摘要、作者"
-                                     @on-search="doQuery()"
-                                     v-model="form.keyword"
-                                     clearable
-                                     search></i-input>
-                        </form-item>
-                    </i-col>
                 </row>
             </i-form>
         </card>
 
         <!-- 内容 -->
         <card dis-hover :bordered="false" class="margin-top-16 nsc-list">
-            <div class="nsc-list-header">
-                <div class="nsc-list-header-left">
-                    <button-group>
-                        <i-button icon="md-person-add">添加</i-button>
-                        <i-button icon="md-create">编辑</i-button>
-                        <i-button icon="md-trash">删除</i-button>
-                    </button-group>
-                </div>
-                <div class="nsc-list-header-right">
-                </div>
-            </div>
-
             <div class="nsc-list-body margin-top-8 margin-bottom-8">
                 <i-table :loading="loading"
                          :data="listRecords.list"
                          :columns="columns"></i-table>
             </div>
-
             <div class="nsc-list-footer">
                 <div class="nsc-list-footer-left"></div>
                 <div class="nsc-list-footer-right">
@@ -86,19 +65,27 @@
 <style>
 </style>
 <script>
+    import datePickerOptions from '../common/date-picker-options'
+    import moment from 'moment'
+
+    const DATE_FORMAT = 'YYYY/MM/DD'
+    moment.locale('zh-cn')
     export default {
         data() {
+
+            let startTime = new Date()
+            startTime.setTime(startTime - 3600 * 1000 * 24 * 6)
             return {
+                cu: this.$localStore.getItem(this.$localStore.Keys.USER_KEY),   // 当前登录用户
                 pageSizeOptions: [10, 20, 50, 100],
                 form: {
+                    Stat_Date: [startTime, new Date()],
                     Group_ID: '',
-                    Role_ID: '',
-                    keyword: '',
                     page_no: 1,
                     page_size: 10,
                 },
+                datePickerOptions,
                 groups: [],
-                roles: [],
                 listRecords: {
                     list: [],
                     total: 0
@@ -106,38 +93,24 @@
                 loading: false,
                 columns: [
                     {
-                        title: 'ID',
-                        key: 'User_ID',
-                    },
-                    {
-                        title: '帐号',
-                        key: 'User_Account',
-                    },
-                    {
                         title: '名称',
                         key: 'User_Name',
                     },
                     {
-                        title: '最后登陆时间',
-                        key: 'Last_Login_Time',
+                        title: '选稿篇数',
+                        key: 'Selected_Count',
                     },
                     {
-                        title: '创建时间',
-                        key: 'Created_Time',
+                        title: '翻译字数',
+                        key: 'Translate_Character_Count',
                     },
                     {
-                        title: '工作组',
-                        key: 'Group',
-                        render(h, {row}) {
-                            return h('span', row['Groups'].map(v => v['Work_Group_Name']).join(','))
-                        },
+                        title: '校对字数',
+                        key: 'Review_Character_Count',
                     },
                     {
-                        title: '角色',
-                        key: 'Roles',
-                        render(h, {row}) {
-                            return h('span', row['Roles'].map(v => v['Role_Name']).join(','))
-                        },
+                        title: '编辑字数',
+                        key: 'Audit_Character_Count',
                     },
                 ],
             }
@@ -145,10 +118,8 @@
         created() {
             Promise.all([
                 this.$api.system.groups(),
-                this.$api.system.roles(),
             ]).then(resp => {
                 this.groups = resp[0].data
-                this.roles = resp[1].data.list
             })
         },
         methods: {
@@ -163,8 +134,16 @@
                 }
 
                 let params = {...this.form}
+
+                // 处理时间
+                if (params.Stat_Date.length === 2) {
+                    params.Stat_Date = params.Stat_Date.map(v => {
+                        return (v instanceof Date) ? moment(v).format(DATE_FORMAT) : v
+                    }).join('-')
+                }
+
                 this.loading = true
-                this.$api.management.user.list(params).then(resp => {
+                this.$api.management.stat.list(params).then(resp => {
                     this.loading = false
                     this.listRecords = resp.data
                 })
@@ -188,6 +167,17 @@
             doPageChange (current) {
                 this.form.page_no = current
                 this.doQuery(false)
+            },
+
+            /**
+             * 处理日期控件的变化事件
+             *
+             * @param {array|string} date 改变的日期
+             * @param {string} type 类型
+             */
+            handleDatePickerChange (date, type) {
+                this.form.Stat_Date = date
+                this.doQuery(true)
             },
         },
         components: {},

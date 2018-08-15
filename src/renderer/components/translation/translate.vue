@@ -37,7 +37,7 @@
             <p slot="extra">
                 <span>{{saveStatus}}</span>
                 <divider type="vertical"/>
-                <span>字数：{{numeral(countInfo.characters).format('0,0')}}</span>
+                <span>字数：{{numeral(characterCount).format('0,0')}}</span>
                 <divider type="vertical"/>
                 <span>正在翻译</span>
             </p>
@@ -132,21 +132,36 @@
                     Translate_Title: '',
                     Translate_Content: '',
                 },
-                countInfo: {
+                contentCount: {
                     paragraphs: 0,
                     sentences: 0,
                     words: 0,
                     characters: 0,
                     all: 0
                 },
+                titleCount: {
+                    paragraphs: 0,
+                    sentences: 0,
+                    words: 0,
+                    characters: 0,
+                    all: 0
+                }
+            }
+        },
+        computed: {
+            characterCount() {
+                return this.titleCount.characters + this.contentCount.characters
             }
         },
         watch: {
             translateArticle: {
                 handler(val, old) {
-                    Countable.count(val.Translate_Content, countInfo => {
-                        this.countInfo = countInfo
+                    Countable.count(val.Translate_Content, contentCount => {
+                        this.contentCount = contentCount
                     }, {stripTags: true})
+                    Countable.count(val.Translate_Title, countInfo => {
+                        this.titleCount = countInfo
+                    })
 
                     if (moment().diff(this.lastSaveTime, 'seconds') > 30) {
                         this.lastSaveTime = moment()
@@ -212,7 +227,8 @@
                 let reqData = {
                     Article_Translate_ID: this.$route.params.id,
                     Translate_Title: this.translateArticle['Translate_Title'],
-                    Translate_Content: this.translateArticle['Translate_Content'].replace(/<p><br><\/p>/g, "")
+                    Translate_Content: this.translateArticle['Translate_Content'].replace(/<p><br><\/p>/g, ""),
+                    Character_Count: this.characterCount,
                 }
                 this.$api.translation.save(reqData).then(resp => {
                     this.saveStatus = '已保存'

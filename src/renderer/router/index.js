@@ -139,6 +139,10 @@ export default new Router({
                     component: () => import('../components/management/parameter'),
                 },
                 {
+                    path: 'language',
+                    component: () => import('../components/management/language'),
+                },
+                {
                     path: 'statistics',
                     component: () => import('../components/management/statistics'),
                 },

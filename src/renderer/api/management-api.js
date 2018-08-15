@@ -42,4 +42,28 @@ export default {
             return api.doRequest(PREFIX + 'work-group/delete', api.DELETE, params)
         },
     },
+    parameter: {
+        list(params) {
+            return api.doRequest(PREFIX + 'parameter/list', api.GET, params)
+        },
+        edit(data) {
+            return api.doRequest(PREFIX + 'parameter/edit', api.PUT, {}, data)
+        },
+    },
+    language: {
+        list(params) {
+            return api.doRequest(PREFIX + 'language/list', api.GET, params)
+        },
+        edit(data) {
+            return api.doRequest(PREFIX + 'language/edit', api.PUT, {}, data)
+        },
+        delete(params) {
+            return api.doRequest(PREFIX + 'language/delete', api.DELETE, params)
+        },
+    },
+    stat: {
+        list(params) {
+            return api.doRequest(PREFIX + 'stat/list', api.GET, params)
+        },
+    },
 }
