@@ -52,15 +52,15 @@
         '0005.jpg',
         '0006.jpg',
         '0007.jpg',
-        // '03309_damnationcreektrail_1920x1080.jpg',
-        // '04115_victoriasview_1920x1080.jpg',
-        // '04118_friolero_1920x1080.jpg',
-        // '04134_sassolungo_1920x1080.jpg',
-        // '04140_coloradobackroad_1920x1080.jpg',
-        // '04149_mountainlake_1920x1080.jpg',
-        // '04151_landmannalaugarinthesummer_1920x1080.jpg',
-        // '04156_coloursofmiddleearth_1920x1080.jpg',
-        // '04158_morningatthedeschutes_1920x1080.jpg'
+        '03309_damnationcreektrail_1920x1080.jpg',
+        '04115_victoriasview_1920x1080.jpg',
+        '04118_friolero_1920x1080.jpg',
+        '04134_sassolungo_1920x1080.jpg',
+        '04140_coloradobackroad_1920x1080.jpg',
+        '04149_mountainlake_1920x1080.jpg',
+        '04151_landmannalaugarinthesummer_1920x1080.jpg',
+        '04156_coloursofmiddleearth_1920x1080.jpg',
+        '04158_morningatthedeschutes_1920x1080.jpg'
     ]
     export default {
         name: 'Login',
