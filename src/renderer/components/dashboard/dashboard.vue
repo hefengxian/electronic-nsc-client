@@ -60,7 +60,7 @@
                 personalStats: [
                     {
                         code: 'Extract_Count',
-                        label: '今日总采集/添加文章',
+                        label: '今日总采集/添加',
                         icon: 'md-download',
                         color: '#34495E'
                     },
@@ -72,25 +72,25 @@
                     },
                     {
                         code: 'Trans_Count',
-                        label: '待译文章',
+                        label: '今日待译',
                         icon: 'md-swap',
                         color: '#F05050'
                     },
                     {
                         code: 'Review_Count',
-                        label: '待校文章',
+                        label: '今日待校',
                         icon: 'md-done-all',
                         color: '#1ABC9C'
                     },
                     {
                         code: 'Audit_Count',
-                        label: '待编文章',
+                        label: '今日待编',
                         icon: 'ios-create',
                         color: '#7266ba'
                     },
                     {
                         code: 'Finish_Count',
-                        label: '成稿文章',
+                        label: '今日成稿',
                         icon: 'md-filing',
                         color: '#23b7e5'
                     },
@@ -108,20 +108,7 @@
             }
         },
         mounted() {
-            let trendChart = echarts.init(document.getElementById('trend'), 'roma');
-            let percentChart = echarts.init(document.getElementById('percent'), 'roma');
-            trendChart.showLoading()
-            percentChart.showLoading()
-            this.$api.dashboard.operationData().then(resp => {
-                this.opData = resp.data
-                percentChart.hideLoading()
-                this.initOperationPercentChart(percentChart)
-            })
-            this.$api.dashboard.recentSummary().then(resp => {
-                this.summary7Day = resp.data
-                trendChart.hideLoading()
-                this.initTrendChart(trendChart)
-            })
+
         },
         methods: {
             initTrendChart(chart) {
@@ -243,6 +230,29 @@
         },
         components: {
             layout: require('../common/layout').default
+        },
+        beforeRouteEnter(to, from, next) {
+            next(vm => {
+                let trendChart = echarts.init(document.getElementById('trend'), 'roma');
+                let percentChart = echarts.init(document.getElementById('percent'), 'roma');
+                trendChart.showLoading()
+                percentChart.showLoading()
+
+                Promise.all([
+                    vm.$api.dashboard.operationData(),
+                    vm.$api.dashboard.recentSummary(),
+                ]).then(responses => {
+                    vm.opData = responses[0].data
+                    vm.summary7Day = responses[1].data
+                    trendChart.hideLoading()
+                    percentChart.hideLoading()
+
+                    vm.$nextTick(() => {
+                        vm.initOperationPercentChart(percentChart)
+                        vm.initTrendChart(trendChart)
+                    })
+                })
+            })
         }
     }
 </script>

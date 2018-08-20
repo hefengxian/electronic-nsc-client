@@ -28,6 +28,9 @@
                               title="将状态设置为完成，并保存当前未保存的内容"
                               @click="finish"
                               icon="md-checkmark-circle">完成编辑</i-button>
+                    <i-button @click="finishEdit"
+                              v-if="article.Translate_Status === 'AF'"
+                              icon="md-checkmark">完成修改</i-button>
                 </button-group>
 
                 <div style="display: inline-block; margin-left: 16px; font-size: 12px;"> 评分：
@@ -65,7 +68,7 @@
                           slot="right"
                           style="padding: 16px"
                           :bordered="false">
-                        <i-form ref="create-form"
+                        <i-form @submit.native.prevent ref="create-form"
                                 :model="translateArticle"
                                 label-position="top">
                             <form-item label="标题">
@@ -217,12 +220,16 @@
 
             /**
              * 保存到服务器
+             * @param {function} callback 保存完成之后的回调
              */
-            save() {
+            save(callback = null) {
                 if (this.translateArticle['title'] === this.article['Audit_Title'] &&
                     this.translateArticle['content'] === this.article['Audit_Content'] &&
                     this.translateArticle.score === this.article['Translate_Score_By_Audit']) {
                     this.saveStatus = '已保存'
+                    if (callback instanceof Function) {
+                        callback()
+                    }
                     // 如果内容没有变动，无需保存
                     return
                 }
@@ -244,6 +251,9 @@
                         // 更新这两个字段
                         this.article['Audit_Title'] = reqData.Audit_Title
                         this.article['Audit_Content'] = reqData.Audit_Content
+                        if (callback instanceof Function) {
+                            callback()
+                        }
                     }
                 }).catch(err => {
                     this.saveStatus = '保存失败'
@@ -284,6 +294,19 @@
                     }
                 }).catch(err => {})
             },
+
+            /**
+             * 用来在修改校对之后点完成
+             */
+            finishEdit() {
+                if (this.saveStatus === '已保存') {
+                    this.$router.push(`/audit/detail/${this.$route.params.id}`)
+                    return
+                }
+                this.save(() => {
+                    this.$router.push(`/audit/detail/${this.$route.params.id}`)
+                })
+            }
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {

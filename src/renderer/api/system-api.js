@@ -17,8 +17,8 @@ export default {
     userInfo() {
         return api.doRequest(PREFIX + 'userinfo', api.GET)
     },
-    privilege() {
-        return api.doRequest(PREFIX + 'privilege', api.GET)
+    privileges() {
+        return api.doRequest(PREFIX + 'privileges', api.GET)
     },
     languages() {
         return api.doRequest(PREFIX + 'languages', api.GET)

@@ -12,7 +12,7 @@
         <card dis-hover
               class="nsc-form"
               :bordered="false">
-            <i-form label-position="top"
+            <i-form @submit.native.prevent label-position="top"
                     v-model="form">
                 <row :gutter="24">
                     <i-col :span="4">
@@ -44,7 +44,7 @@
                         </form-item>
                     </i-col>
                     <i-col :span="4">
-                        <form-item label="用户组">
+                        <form-item label="工作组">
                             <i-select v-model="form.Group_ID"
                                       clearable
                                       @on-change="doQuery()">
@@ -102,12 +102,12 @@
                     <table style="width: 100%; border: 0;" cellspacing="0" cellpadding="0">
                         <thead>
                         <tr>
-                            <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">入库时间</th>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 180px">入库时间</th>
                             <th class="ivu-table-cell">译文标题</th>
-                            <th class="ivu-table-cell" style="width: 150px">翻译员</th>
-                            <th class="ivu-table-cell" style="width: 150px">校对员</th>
-                            <th class="ivu-table-cell" style="width: 150px">编辑</th>
-                            <th class="ivu-table-cell ivu-table-column-center" style="width: 150px">操作</th>
+                            <th class="ivu-table-cell" style="width: 180px">翻译员</th>
+                            <th class="ivu-table-cell" style="width: 180px">校对员</th>
+                            <th class="ivu-table-cell" style="width: 180px">编辑</th>
+                            <th class="ivu-table-cell ivu-table-column-center" style="width: 180px">操作</th>
                         </tr>
                         </thead>
                         <tbody class="ivu-table-tbody">
@@ -211,7 +211,7 @@
                 checkAll: false,
                 moment,
                 form: {
-                    Translate_Status: '',
+                    Translate_Status: 'RF',
                     Raw_Language_Code: '',
                     User_ID: '',
                     Group_ID: '',

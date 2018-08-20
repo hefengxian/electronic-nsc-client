@@ -21,7 +21,8 @@
                 <a href="static/help.html"
                    target="_blank"
                    class="nsc-header-right-item">
-                    <icon type="md-help-circle"></icon> 使用帮助
+                    <icon type="md-help-circle"></icon>
+                    使用帮助
                 </a>
 
                 <dropdown transfer
@@ -33,7 +34,7 @@
                         <icon type="md-arrow-dropdown"></icon>
                     </div>
                     <DropdownMenu slot="list">
-                        <DropdownItem>
+                        <DropdownItem @click.native="$router.push('/personal')">
                             <icon type="ios-person"></icon>
                             个人中心
                         </DropdownItem>
@@ -67,58 +68,67 @@
 </template>
 
 <script>
+    const rawMenus = [
+        {
+            link: '/dashboard',
+            icon: 'ios-analytics',
+            label: '主页',
+        },
+        {
+            link: '/extraction',
+            icon: 'md-download',
+            label: '采集库',
+        },
+        {
+            link: '/translation',
+            icon: 'md-swap',
+            label: '待译库',
+        },
+        {
+            link: '/proofreading',
+            icon: 'md-done-all',
+            label: '待校库',
+        },
+        {
+            link: '/audit',
+            icon: 'ios-create',
+            label: '待编库',
+        },
+        {
+            link: '/finished',
+            icon: 'md-filing',
+            label: '成稿库',
+        },
+        {
+            link: '/management',
+            icon: 'ios-build',
+            label: '管理',
+        },
+        {
+            link: '/personal',
+            icon: 'md-contact',
+            label: '个人中心',
+        },
+    ]
+
     export default {
         name: "layout",
-        data() {
+        data () {
             let userInfo = this.$localStore.getItem(this.$localStore.Keys.USER_KEY)
+            let privileges = this.$localStore.getItem(this.$localStore.Keys.PRIVILEGE_KEY)
+
+            let menus = rawMenus.filter(v => {
+                return privileges[v.link].Can_Browse === 1
+            })
             return {
                 userInfo,
-                menus: [
-                    {
-                        link: '/dashboard',
-                        icon: 'ios-analytics',
-                        label: '主页',
-                    },
-                    {
-                        link: '/extraction',
-                        icon: 'md-download',
-                        label: '采集库',
-                    },
-                    {
-                        link: '/translation',
-                        icon: 'md-swap',
-                        label: '待译库',
-                    },
-                    {
-                        link: '/proofreading',
-                        icon: 'md-done-all',
-                        label: '待校库',
-                    },
-                    {
-                        link: '/audit',
-                        icon: 'ios-create',
-                        label: '待编库',
-                    },
-                    {
-                        link: '/finished',
-                        icon: 'md-filing',
-                        label: '成稿库',
-                    },
-                    {
-                        link: '/management',
-                        icon: 'ios-build',
-                        label: '管理',
-                    },
-                    {
-                        link: '/personal-center',
-                        icon: 'ios-person',
-                        label: '个人中心',
-                    },
-                ],
+                menus
             }
         },
+        computed: {
+        },
         methods: {
-            logout() {
+            logout () {
                 this.$localStore.clear()
                 this.$router.push('/login')
             },

@@ -113,9 +113,6 @@ hr {
       line-height: 35px;
       padding: 40px 0;
       text-align: center;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
     }
 
     & .article-abstract, & .article-content {
@@ -325,12 +322,17 @@ hr {
   &-header, &-footer {
     display: flex;
     &-left {
-      flex: 1;
     }
     &-right {
-      flex: 0 0 1;
+      flex: 1;
       display: flex;
       justify-content: flex-end;
     }
   }
+}
+
+.nsc-filter {
+    & .ivu-form-item {
+        margin-bottom: 0;
+    }
 }

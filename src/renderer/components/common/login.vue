@@ -1,11 +1,15 @@
 <template>
-    <div class="nsc-login" :style="loginBGImage">
+    <div class="nsc-login">
+        <div v-for="(src, key) in bgImages"
+             :style="{'background-image': `url(static/images/backgrounds/${src})`, opacity: key === bgIndex ? 1 : 0}"
+
+             class="background-image"></div>
         <div class="login-container">
             <div class="logo">
                 <img src="static/images/logo/logo.png" alt="LOGO">
             </div>
             <div class="title">外文体育信息采编系统</div>
-            <p class="info">用户登录</p>
+            <p class="sub-title">用户登录</p>
             <div class="login-form" @keypress.enter="handleSubmit">
                 <div class="form-item">
                     <input type="text"
@@ -32,11 +36,11 @@
         </div>
 
         <!-- 预加载，避免图片切换的时候闪屏 -->
-        <img v-for="(src, key) in bgImages"
+        <!--<img v-for="(src, key) in bgImages"
              :src="`static/images/backgrounds/${src}`"
              :key="key"
              alt="preload"
-             style="display: none">
+             style="display: none">-->
     </div>
 </template>
 
@@ -48,23 +52,23 @@
         '0005.jpg',
         '0006.jpg',
         '0007.jpg',
-        '03309_damnationcreektrail_1920x1080.jpg',
-        '04115_victoriasview_1920x1080.jpg',
-        '04118_friolero_1920x1080.jpg',
-        '04134_sassolungo_1920x1080.jpg',
-        '04140_coloradobackroad_1920x1080.jpg',
-        '04149_mountainlake_1920x1080.jpg',
-        '04151_landmannalaugarinthesummer_1920x1080.jpg',
-        '04156_coloursofmiddleearth_1920x1080.jpg',
-        '04158_morningatthedeschutes_1920x1080.jpg'
+        // '03309_damnationcreektrail_1920x1080.jpg',
+        // '04115_victoriasview_1920x1080.jpg',
+        // '04118_friolero_1920x1080.jpg',
+        // '04134_sassolungo_1920x1080.jpg',
+        // '04140_coloradobackroad_1920x1080.jpg',
+        // '04149_mountainlake_1920x1080.jpg',
+        // '04151_landmannalaugarinthesummer_1920x1080.jpg',
+        // '04156_coloursofmiddleearth_1920x1080.jpg',
+        // '04158_morningatthedeschutes_1920x1080.jpg'
     ]
     export default {
         name: 'Login',
         data () {
             return {
                 loading: false,
-                username: 'admin',
-                password: 'admin',
+                username: '',
+                password: '',
                 bgIndex: Math.floor(Math.random() * bgImages.length),
                 intervalId: null,
                 bgImages,
@@ -97,29 +101,44 @@
                 }
                 this.loading = true
                 this.$api.public.login(data).then(resp => {
+                    this.loading = false
                     let oauth = resp.data
                     // 存储 Token 信息
                     this.$localStore.setItem(this.$localStore.Keys.OAUTH_KEY, oauth)
                     // 设置 axios 请求头
                     this.$api.setAuthorization(oauth)
+
                     // 获取其他信息；用户信息，权限信息
-                    this.$api.system.userInfo().then(resp => {
-                        this.loading = false
-                        this.$localStore.setItem(this.$localStore.Keys.USER_KEY, resp.data)
+                    Promise.all([
+                        this.$api.system.userInfo(),
+                        this.$api.system.privileges(),
+                    ]).then(responses => {
+                        this.$localStore.setItem(this.$localStore.Keys.USER_KEY, responses[0].data)
+                        this.$localStore.setItem(this.$localStore.Keys.PRIVILEGE_KEY, responses[1].data)
                         // 跳转
                         this.$router.push('/dashboard')
-
                     })
-
                 }).catch(e => {
-                    console.log(e)
+                    this.loading = false
+                    if (e.response && e.response.data.error === 'invalid_credentials') {
+                        this.$Message.error("账号或者密码错误")
+                    }
                 })
-                // this.$router.push('/dashboard')
-            }
+            },
         },
         beforeDestroy () {
             if (this.intervalId != null) {
                 clearInterval(this.intervalId)
+            }
+        },
+        beforeRouteEnter(to, from, next) {
+
+            let Vue = require('vue').default
+            if (Vue.localStore.getItem(Vue.localStore.Keys.OAUTH_KEY)) {
+                // 如果用户已经登录了，直接进入主页
+                next('/dashboard')
+            } else {
+                next()
             }
         }
     }
@@ -130,9 +149,19 @@
         width: 100%;
         height: 100vh;
         overflow: hidden;
-        background-size: cover;
-        backface-visibility: hidden;
-        transition: all 1s ease-in-out;
+
+        & .background-image {
+            width: 100%;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            position: absolute;
+            overflow: hidden;
+            z-index: -1;
+            background-size: cover;
+            backface-visibility: hidden;
+            transition: all 1s ease-in-out;
+        }
 
         & .login-container {
             width: 360px;
@@ -152,7 +181,7 @@
                 color: #fff;
             }
 
-            & .info {
+            & .sub-title {
                 margin: 16px 0;
                 text-align: center;
                 color: #fff;

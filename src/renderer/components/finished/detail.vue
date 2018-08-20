@@ -4,7 +4,7 @@
         <div class="nsc-body-right-nav">
             <div class="nsc-body-right-nav-left">
                 <Breadcrumb>
-                    <BreadcrumbItem to="/audit">
+                    <BreadcrumbItem to="/finished">
                         <icon type="md-create"></icon>
                         成稿库
                     </BreadcrumbItem>
